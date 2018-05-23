@@ -3,8 +3,8 @@
   main.cpp
   SDLR.cpp
   Texture.cpp
-     Creating library D:\Unnecessary Icons\CityDefense\Release\CityDefense.lib and object D:\Unnecessary Icons\CityDefense\Release\CityDefense.exp
+     Creating library C:\Users\Mary\Documents\GitHub\CityDefenseGame\CityDefense\Release\CityDefense.lib and object C:\Users\Mary\Documents\GitHub\CityDefenseGame\CityDefense\Release\CityDefense.exp
   Generating code
   All 266 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
-  CityDefense.vcxproj -> D:\Unnecessary Icons\CityDefense\Release\CityDefense.exe
+  CityDefense.vcxproj -> C:\Users\Mary\Documents\GitHub\CityDefenseGame\CityDefense\Release\CityDefense.exe
