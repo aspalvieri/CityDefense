@@ -19,6 +19,9 @@
     <Filter Include="Header Files\include">
       <UniqueIdentifier>{86df223e-1287-49d3-8287-60bf57965bde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Variables">
+      <UniqueIdentifier>{71fbd4c9-7f51-41bc-87f4-3d9a735239fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -36,6 +39,9 @@
     <ClCompile Include="source\Button.cpp">
       <Filter>Source Files\source</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sprite.cpp">
+      <Filter>Source Files\source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Button.h">
@@ -44,16 +50,19 @@
     <ClInclude Include="include\Game.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Globals.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Includes.h">
-      <Filter>Header Files\include</Filter>
-    </ClInclude>
     <ClInclude Include="include\SDLR.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
     <ClInclude Include="include\Texture.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Globals.h">
+      <Filter>Header Files\Variables</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Includes.h">
+      <Filter>Header Files\Variables</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Sprite.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
   </ItemGroup>

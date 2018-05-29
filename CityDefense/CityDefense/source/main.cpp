@@ -9,6 +9,10 @@ SDL_Renderer* SDLR::gRenderer = SDL_CreateRenderer(SDLR::gWindow, -1, SDL_RENDER
 pair<int, int> SDLR::mousePosition = { 0, 0 };
 int SDLR::mouseButton = 0;
 
+//Declare static managers
+vector<Button*> Button::buttonManager;
+vector<Sprite*> Sprite::spriteManager;
+
 int main(int argc, char* argv[])
 {
 	bool quit = false;

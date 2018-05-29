@@ -8,11 +8,20 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <unordered_map>
+#include <iomanip>
 #include <vector>
 #include <sstream>
 #include <algorithm>
 #include <time.h>
 
 using namespace std;
+
+//Circle structure
+struct Circle
+{
+	int x, y;
+	int r;
+};
 
 #endif//INCLUDES_H

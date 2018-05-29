@@ -8,16 +8,33 @@ bool Game::runGame()
 		
 		while (SDL_PollEvent(&e) != 0)
 		{
-			a.handleEvents(&e);
-			b.handleEvents(&e);
+			for (auto & button : Button::buttonManager) {
+				button->handleEvents(&e);
+			}
 
 			//Update the user's mouse properties
 			if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
 				*mouseButton = SDL_GetMouseState(&mousePos->first, &mousePos->second);
 
+			//User presses a key down
+			if (e.type == SDL_KEYDOWN) {
+				switch (e.key.keysym.sym) {
+				case SDLK_ESCAPE:
+					quit = true;
+					break;
+				default:
+					break;
+				}
+			}
+
 			//User presses exit
 			if (e.type == SDL_QUIT)
 				quit = true;
+		}
+
+		for (auto & sprite : Sprite::spriteManager) {
+			sprite->nextFrame();
+			sprite->draw();
 		}
 
 		a.render();
@@ -25,10 +42,12 @@ bool Game::runGame()
 		if (a.Pressed()) {
 			b.setVisible(true);
 			a.setVisible(false);
+			g.setVisible(false);
 		}
 		if (b.Pressed()) {
 			a.setVisible(true);
 			b.setVisible(false);
+			g.setVisible(true);
 		}
 
 		SDL_RenderPresent(gRenderer);
@@ -72,15 +91,22 @@ void Game::buildButtons()
 	a.setImage("bin/images/button.png")
 		.setPosition(250, 250)
 		.setSize(50, 50)
-		.setText("S-A", { 255,255,0 }, fontManager[18]);
+		.setText("Off", { 255,255,0 }, fontManager[18]);
 	b.setImage("bin/images/button.png")
 		.setPosition(350, 250)
 		.setSize(50, 50)
-		.setText("S-B", { 0,255,255 }, fontManager[18])
+		.setText("On", { 0,255,0 }, fontManager[18])
 		.setVisible(false);
 }
 
 void Game::buildImages()
 {
+	g.loadSpriteImage("bin/images/weaponforge.png")
+		.setFrameSize(100, 100)
+		.setSize(100, 100)
+		.setDelay(3)
+		.pushFrameRow("Idle", 0, 0, 100, 0, 7)
+		.pushFrameRow("Idle", 0, 100, 100, 0, 7)
+		.setAnimation("Idle");
 }
 

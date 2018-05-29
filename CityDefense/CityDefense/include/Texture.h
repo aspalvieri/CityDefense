@@ -20,6 +20,10 @@ public:
 
 	void setSize(double w, double h);
 
+	void setScale(double w, double h);
+
+	void setAlpha(Uint8 a);
+
 	//Variables
 	int width = 0;
 	int height = 0;

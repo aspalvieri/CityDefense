@@ -100,3 +100,13 @@ void Texture::setSize(double w, double h)
 	scale.first = scaleWidth / width;
 	scale.second = scaleHeight / height;
 }
+
+void Texture::setScale(double w, double h)
+{
+	scale = { w, h };
+}
+
+void Texture::setAlpha(Uint8 a)
+{
+	SDL_SetTextureAlphaMod(texture, a);
+}

@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "Texture.h"
+#include "Sprite.h"
 #include "Button.h"
 
 class Game
@@ -22,6 +23,7 @@ public:
 
 private:
 	Button a, b;
+	Sprite g;
 
 	//Primary variable
 	bool quit = false;

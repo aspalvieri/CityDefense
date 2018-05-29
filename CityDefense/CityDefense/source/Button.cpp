@@ -8,10 +8,13 @@ Button::Button()
 	mouseButton = &SDLR::mouseButton;
 
 	clip = { 0, 0, 200, 100 };
+
+	Button::buttonManager.push_back(this);
 }
 
 Button::~Button()
 {
+	Button::buttonManager.erase(remove(Button::buttonManager.begin(), Button::buttonManager.end(), this), Button::buttonManager.end());
 }
 
 Button& Button::setText(string t, SDL_Color col, TTF_Font* font)

@@ -9,6 +9,8 @@ public:
 	Button();
 	~Button();
 
+	static vector<Button*> buttonManager;
+
 	Button& setText(string t, SDL_Color = { 255,255,255 }, TTF_Font* = NULL);
 
 	Button& setSize(double w, double h);
