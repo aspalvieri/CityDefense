@@ -166,10 +166,13 @@ public:
 
 	bool getVisible();
 
-	std::string spriteName = "";
+	Sprite & setName(std::string n);
+
+	std::string getName();
 
 private:
 	std::unordered_map<std::string, Texture> images;
+	std::string spriteName = "";
 
 	// a list of animations (only need to store 2 ints, x/y, because width/height are always the same)
 	std::unordered_map<std::string, std::vector<std::pair<int, int>>> animations;

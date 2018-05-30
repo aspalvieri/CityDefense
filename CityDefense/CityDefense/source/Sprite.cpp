@@ -264,6 +264,17 @@ bool Sprite::getVisible()
 	return visible;
 }
 
+Sprite & Sprite::setName(std::string n)
+{
+	spriteName = n;
+	return *this;
+}
+
+std::string Sprite::getName()
+{
+	return spriteName;
+}
+
 bool checkCollision(SDL_Rect &A, SDL_Rect &B)
 {
 	//The sides of the rectangles
