@@ -10,148 +10,63 @@ public:
 	Sprite();
 	~Sprite();
 
+	//All sprites are added to this on creation, removed on deletion
 	static vector<Sprite*> spriteManager;
 
-	/*  loadSpriteImage
-		- Loads the specified image location
-	*/
 	Sprite& loadSpriteImage(std::string fileLocation);
 
-	/* setFrameSize
-		- Width and height of the Sprite's clip
-	*/
 	Sprite& setFrameSize(int width, int height);
 
-	/* setPosition
-		- X/Y coordinates of the Sprite
-	*/
 	Sprite& setPosition(double x, double y);
 
-	/* getPosition
-		- returns a pair of doubles of the position
-	*/
 	std::pair<double, double> getPosition();
 
-	/* setSize
-		- Width/Height to scale the Sprite by
-	*/
 	Sprite& setSize(double width, double height);
 
-	/* getSize
-		- returns a pair of doubles with the size
-	*/
 	std::pair<double, double> getSize();
-	
-	/* setAlpha
-		- sets the transparency of the Sprite, 0 to 255
-	*/
+
 	Sprite& setAlpha(Uint8 a);
 
-	/* pushFrameRow
-		- animationID, the name of the animation
-		- start X/Y, coordinates of the first frame
-		- space X/Y, pixel offsets between each frame
-		- numFrames, number of frames in the row
-	*/
 	Sprite& pushFrameRow(std::string animationID, int startX, int startY, int spaceX, int spaceY, int numFrames);
 
-	/* pushFrame
-		- animationID, the name of the animation
-		- x/y, coordinates of the frame. Be sure to use setFrameSize() before this.
-	*/
 	Sprite& pushFrame(std::string animationID, int x, int y);
 
-	/* setAnimation
-		- sets the current animation to animationID
-	*/
 	Sprite& setAnimation(std::string animationID);
 
 	Sprite& setAnimationRaw(std::string animationID);
 
-	/* getCurrentAnimation
-		- returns the string used in currentAnimation
-	*/
 	std::string getCurrentAnimation();
 
-	/* getAnimationSize
-		- returns the amount of frames in the current animation
-	*/
 	int getCurrentAnimationSize();
 
-	/* setFrame
-		- sets the frame that the animation will be on
-	*/
 	Sprite& setFrame(int frame);
 
-	/* getFrame
-		- returns the current frame number
-	*/
 	int getFrame();
 
-	/* setAngle
-		- sets the rotation of the Sprite
-	*/
 	Sprite& setAngle(double ang);
 
-	/* setCenter
-		- sets the X/Y pixel center of rotation of the Sprite
-	*/
 	Sprite& setCenter(int x, int y);
 
-	/* getCenter
-		- returns the SDL_Point of the center of rotation
-	*/
 	SDL_Point getCenter();
 
-	/* setDelay
-		- sets the delay between each frame update
-		- needs to be atleast 1
-	*/
 	Sprite& setDelay(unsigned int time);
 
-	/* resetTicks
-		- resets the delay ticks
-	*/
 	Sprite& resetTicks();
 
-	/* setCollide
-		- True/False, sets if the sprite can be collided with
-	*/
 	Sprite& setCollide(bool col);
 
-	/* getCollide
-		- returns true/false of the collider
-	*/
 	bool getCollide();
 
-	/* nextFrame
-		- increase frame by 1
-	*/
 	Sprite& nextFrame();
 
-	/* finishedAnimation
-		- returns true if the Sprite has gone through all it's frames
-	*/
 	bool finishedAnimation();
 
-	/* finishedFrame
-		- returns true if the ticks equals the delay, meaning the frame has been used
-	*/
 	bool finishedFrame();
 
-	/* draw
-		- draws sprite to screen
-	*/
 	Sprite& draw();
 
-	/* getBox
-		- returns the bounding box of the Sprite
-	*/
 	SDL_Rect getBox();
 
-	/* getSprite
-		- returns this
-	*/
 	Sprite getSprite();
 
 	Sprite& getSpriteReference();
