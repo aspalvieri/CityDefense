@@ -62,6 +62,12 @@ Button & Button::setImage(Texture img)
 	return *this;
 }
 
+Button & Button::setCamera(SDL_Rect * cam)
+{
+	camera = cam;
+	return *this;
+}
+
 void Button::setVisible(bool v)
 {
 	visible = v;
@@ -99,7 +105,9 @@ void Button::handleEvents(SDL_Event * e)
 {
 	if (visible && (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP))
 	{
-		if (mousePos->first >= x && mousePos->second >= y && mousePos->first <= x + width && mousePos->second <= y + height)
+		int cx = (camera == NULL) ? 0 : camera->x;
+		int cy = (camera == NULL) ? 0 : camera->y;
+		if (mousePos->first >= x - cx && mousePos->second >= y - cy && mousePos->first <= x + width - cx && mousePos->second <= y + height - cy)
 		{
 			if (!pressed)
 				clip.y = 100;
@@ -131,8 +139,14 @@ void Button::render(int nx, int ny)
 			x = nx;
 		if (ny > 0)
 			y = ny;
-		image.render((int)x, (int)y, &clip);
-		name.render((int)(bx + x), (int)(by + y));
+		if (camera == NULL) {
+			image.render((int)x, (int)y, &clip);
+			name.render((int)(bx + x), (int)(by + y));
+		}
+		else if (camera != NULL) {
+			image.render((int)x - camera->x, (int)y - camera->y, &clip);
+			name.render((int)(bx + x) - camera->x, (int)(by + y) - camera->y);
+		}
 	}
 }
 

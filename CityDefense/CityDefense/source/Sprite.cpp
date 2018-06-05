@@ -221,7 +221,7 @@ Sprite & Sprite::draw()
 		clip.h = frameSize.second;
 		if (camera == NULL)
 			images[location].render(x, y, &clip, angle, &center);
-		else if (camera != NULL)
+		else if (camera != NULL && checkCollision(box, *camera))
 			images[location].render(x - camera->x, y - camera->y, &clip, angle, &center);
 	}
 	return *this;
@@ -245,6 +245,12 @@ Sprite & Sprite::getSpriteReference()
 Sprite & Sprite::setSprite(Sprite s)
 {
 	*this = s;
+	return *this;
+}
+
+Sprite & Sprite::setCamera(SDL_Rect * cam)
+{
+	camera = cam;
 	return *this;
 }
 

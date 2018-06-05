@@ -19,6 +19,9 @@ struct SDLR
 	//User's mouse button
 	static int mouseButton;
 
+	//Player's camera
+	static SDL_Rect camera;
+
 	SDLR();
 };
 

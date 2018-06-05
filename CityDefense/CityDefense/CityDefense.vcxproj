@@ -124,6 +124,7 @@
     <ClCompile Include="source\SDLR.cpp" />
     <ClCompile Include="source\Sprite.cpp" />
     <ClCompile Include="source\Texture.cpp" />
+    <ClCompile Include="source\Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Button.h" />
@@ -133,6 +134,7 @@
     <ClInclude Include="include\SDLR.h" />
     <ClInclude Include="include\Sprite.h" />
     <ClInclude Include="include\Texture.h" />
+    <ClInclude Include="include\Tile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

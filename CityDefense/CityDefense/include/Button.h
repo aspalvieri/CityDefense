@@ -21,6 +21,8 @@ public:
 
 	Button& setImage(Texture img);
 
+	Button& setCamera(SDL_Rect *cam = NULL);
+
 	void setVisible(bool v);
 	bool getVisible();
 
@@ -33,6 +35,7 @@ public:
 	void render(int nx = 0, int ny = 0);
 	
 private:
+	SDL_Rect * camera = NULL;
 	void refresh();
 	bool released = false;
 	bool visible = true;

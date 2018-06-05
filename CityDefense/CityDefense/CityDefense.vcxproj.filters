@@ -42,6 +42,9 @@
     <ClCompile Include="source\Sprite.cpp">
       <Filter>Source Files\source</Filter>
     </ClCompile>
+    <ClCompile Include="source\Tile.cpp">
+      <Filter>Source Files\source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Button.h">
@@ -63,6 +66,9 @@
       <Filter>Header Files\Variables</Filter>
     </ClInclude>
     <ClInclude Include="include\Sprite.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tile.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
   </ItemGroup>

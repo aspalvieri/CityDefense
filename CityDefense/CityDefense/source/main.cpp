@@ -8,6 +8,7 @@ SDL_Window* SDLR::gWindow = SDL_CreateWindow("City Defense", SDL_WINDOWPOS_UNDEF
 SDL_Renderer* SDLR::gRenderer = SDL_CreateRenderer(SDLR::gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 pair<int, int> SDLR::mousePosition = { 0, 0 };
 int SDLR::mouseButton = 0;
+SDL_Rect SDLR::camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 //Declare static managers
 vector<Button*> Button::buttonManager;
@@ -15,19 +16,14 @@ vector<Sprite*> Sprite::spriteManager;
 
 int main(int argc, char* argv[])
 {
-	bool quit = false;
-	do
-	{
-		//Create game class
-		Game game;
+	Game game;
+	game.initialize();
 
-		//Build all run-time functions
-		game.initialize();
-
-		//Run game
-		quit = game.runGame();
-
-	} while (!quit);
+	while (game.running()) {
+		game.handleEvents();
+		game.update();
+		game.render();
+	}
 
 	//Destroy window
 	SDL_DestroyRenderer(SDLR::gRenderer);

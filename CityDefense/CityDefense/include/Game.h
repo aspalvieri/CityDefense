@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Sprite.h"
 #include "Button.h"
+#include "Tile.h"
 
 class Game
 {
@@ -19,14 +20,27 @@ public:
 	void buildImages();
 
 	//Main game
-	bool runGame();
+	void handleEvents();
+	void update();
+	void render();
+	void setCamera();
+	void moveCamera();
+
+	bool running();
 
 private:
 	Button a, b;
 	Sprite g;
 
+	//Tilesheet
+	Texture tilesForest;
+	Tile *tiles[MAP_X][MAP_Y];
+	int maxCamX, maxCamY, maxCamH, maxCamW;
+
 	//Primary variable
-	bool quit = false;
+	bool quit = false, up = false, down = false, right = false, left = false;
+	SDL_Rect *camera;
+	int camSpeed = 8;
 
 	//Static variables
 	pair<int, int> *mousePos;
