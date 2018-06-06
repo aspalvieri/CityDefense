@@ -25,16 +25,7 @@ int main(int argc, char* argv[])
 		game.render();
 	}
 
-	//Destroy window
-	SDL_DestroyRenderer(SDLR::gRenderer);
-	SDL_DestroyWindow(SDLR::gWindow);
-	SDLR::gWindow = NULL;
-	SDLR::gRenderer = NULL;
-
-	//Quit SDL subsystems
-	IMG_Quit();
-	TTF_Quit();
-	SDL_Quit();
+	game.destroy();
 
 	return 0;
 }

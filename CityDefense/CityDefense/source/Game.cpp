@@ -18,15 +18,19 @@ void Game::handleEvents()
 			case SDLK_ESCAPE:
 				quit = true;
 				break;
+			case SDLK_UP:
 			case SDLK_w:
 				up = true;
 				break;
+			case SDLK_DOWN:
 			case SDLK_s:
 				down = true;
 				break;
+			case SDLK_RIGHT:
 			case SDLK_d:
 				right = true;
 				break;
+			case SDLK_LEFT:
 			case SDLK_a:
 				left = true;
 				break;
@@ -38,15 +42,19 @@ void Game::handleEvents()
 		//User presses a key up
 		if (e.type == SDL_KEYUP) {
 			switch (e.key.keysym.sym) {
+			case SDLK_UP:
 			case SDLK_w:
 				up = false;
 				break;
+			case SDLK_DOWN:
 			case SDLK_s:
 				down = false;
 				break;
+			case SDLK_RIGHT:
 			case SDLK_d:
 				right = false;
 				break;
+			case SDLK_LEFT:
 			case SDLK_a:
 				left = false;
 				break;
@@ -199,5 +207,19 @@ void Game::buildImages()
 		.setAnimation("Idle");
 
 	tilesForest.loadImage("bin/images/tilesheetforest.png");
+}
+
+void Game::destroy()
+{
+	//Destroy window
+	SDL_DestroyRenderer(SDLR::gRenderer);
+	SDL_DestroyWindow(SDLR::gWindow);
+	SDLR::gWindow = NULL;
+	SDLR::gRenderer = NULL;
+
+	//Quit SDL subsystems
+	IMG_Quit();
+	TTF_Quit();
+	SDL_Quit();
 }
 

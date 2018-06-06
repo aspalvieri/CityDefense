@@ -18,6 +18,7 @@ public:
 	void buildFontManager();
 	void buildButtons();
 	void buildImages();
+	void destroy();
 
 	//Main game
 	void handleEvents();
