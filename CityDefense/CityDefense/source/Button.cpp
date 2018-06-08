@@ -103,7 +103,7 @@ void Button::updateText(string t)
 
 void Button::handleEvents(SDL_Event * e)
 {
-	if (visible && (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP))
+	if (visible && (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP || e->type == SDL_KEYDOWN || e->type == SDL_KEYUP))
 	{
 		int cx = (camera == NULL) ? 0 : camera->x;
 		int cy = (camera == NULL) ? 0 : camera->y;

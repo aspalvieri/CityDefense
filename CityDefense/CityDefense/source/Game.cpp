@@ -5,9 +5,14 @@ void Game::handleEvents()
 	while (SDL_PollEvent(&e) != 0)
 	{
 		//Update the user's mouse properties
-		if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
+		if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) {
 			*mouseButton = SDL_GetMouseState(&mousePos->first, &mousePos->second);
+		}
 
+		//Handle events for camera
+		cameraEvents(&e);
+
+		//Handle events for all buttons
 		for (auto & button : Button::buttonManager) {
 			button->handleEvents(&e);
 		}
@@ -17,48 +22,6 @@ void Game::handleEvents()
 			switch (e.key.keysym.sym) {
 			case SDLK_ESCAPE:
 				quit = true;
-				break;
-			case SDLK_UP:
-			case SDLK_w:
-				up = true;
-				break;
-			case SDLK_DOWN:
-			case SDLK_s:
-				down = true;
-				break;
-			case SDLK_RIGHT:
-			case SDLK_d:
-				right = true;
-				break;
-			case SDLK_LEFT:
-			case SDLK_a:
-				left = true;
-				break;
-			default:
-				break;
-			}
-		}
-
-		//User presses a key up
-		if (e.type == SDL_KEYUP) {
-			switch (e.key.keysym.sym) {
-			case SDLK_UP:
-			case SDLK_w:
-				up = false;
-				break;
-			case SDLK_DOWN:
-			case SDLK_s:
-				down = false;
-				break;
-			case SDLK_RIGHT:
-			case SDLK_d:
-				right = false;
-				break;
-			case SDLK_LEFT:
-			case SDLK_a:
-				left = false;
-				break;
-			default:
 				break;
 			}
 		}
@@ -111,30 +74,6 @@ void Game::render()
 	SDL_RenderPresent(gRenderer);
 }
 
-void Game::moveCamera()
-{
-	if (up || down || left || right) {
-		camera->x += (right - left) * camSpeed;
-		camera->y += (down - up) * camSpeed;
-		if (camera->x < 0) camera->x = 0;
-		if (camera->y < 0) camera->y = 0;
-		if (camera->x > (MAP_X * TILE_SIZE) - camera->w) camera->x = (MAP_X * TILE_SIZE) - camera->w;
-		if (camera->y > (MAP_Y * TILE_SIZE) - camera->h) camera->y = (MAP_Y * TILE_SIZE) - camera->h;
-		setCamera();
-		if (maxCamW == MAP_X) maxCamW = MAP_X - 1;
-		if (maxCamH == MAP_Y) maxCamH = MAP_Y - 1;
-	}
-}
-
-void Game::setCamera()
-{
-	maxCamY = (int)ceil(camera->y / TILE_SIZE);
-	maxCamH = (int)(((ceil(camera->y / TILE_SIZE) + ceil(camera->h / TILE_SIZE)) < MAP_Y - 1) ? ceil(camera->y / TILE_SIZE) + ceil(camera->h / TILE_SIZE) + 1 : ceil(camera->y / TILE_SIZE) + ceil(camera->h / TILE_SIZE));
-	maxCamX = (int)ceil(camera->x / TILE_SIZE);
-	maxCamW = (int)(((ceil(camera->x / TILE_SIZE) + ceil(camera->w / TILE_SIZE)) < MAP_X - 1) ? ceil(camera->x / TILE_SIZE) + ceil(camera->w / TILE_SIZE) + 1 : ceil(camera->x / TILE_SIZE) + ceil(camera->w / TILE_SIZE));
-
-}
-
 void Game::initialize()
 {
 	buildFontManager();
@@ -160,10 +99,94 @@ Game::Game()
 	camera = &SDLR::camera;
 	mousePos = &SDLR::mousePosition;
 	mouseButton = &SDLR::mouseButton;
+	posx = camera->x;
+	posy = camera->y;
 }
 
 Game::~Game()
 {
+}
+
+void Game::cameraEvents(SDL_Event * e)
+{
+	//User presses a key down
+	if (e->type == SDL_KEYDOWN) {
+		switch (e->key.keysym.sym) {
+		case SDLK_UP:
+		case SDLK_w:
+			up = true;
+			break;
+		case SDLK_DOWN:
+		case SDLK_s:
+			down = true;
+			break;
+		case SDLK_RIGHT:
+		case SDLK_d:
+			right = true;
+			break;
+		case SDLK_LEFT:
+		case SDLK_a:
+			left = true;
+			break;
+		default:
+			break;
+		}
+	}
+
+	//User presses a key up
+	if (e->type == SDL_KEYUP) {
+		switch (e->key.keysym.sym) {
+		case SDLK_UP:
+		case SDLK_w:
+			up = false;
+			break;
+		case SDLK_DOWN:
+		case SDLK_s:
+			down = false;
+			break;
+		case SDLK_RIGHT:
+		case SDLK_d:
+			right = false;
+			break;
+		case SDLK_LEFT:
+		case SDLK_a:
+			left = false;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void Game::moveCamera()
+{
+	if (up || down || left || right) {
+		xspeed = (right - left) * camSpeed;
+		yspeed = (down - up) * camSpeed;
+		if (xspeed != 0 && yspeed != 0) {
+			xspeed /= sqrt(2.0);
+			yspeed /= sqrt(2.0);
+		}
+		posx += xspeed;
+		posy += yspeed;
+		if (posx < 0) posx = 0;
+		if (posy < 0) posy = 0;
+		if (posx > (MAP_X * TILE_SIZE) - camera->w) posx = (MAP_X * TILE_SIZE) - camera->w;
+		if (posy > (MAP_Y * TILE_SIZE) - camera->h) posy = (MAP_Y * TILE_SIZE) - camera->h;
+		camera->x = (int)posx;
+		camera->y = (int)posy;
+		setCamera();
+		if (maxCamW == MAP_X) maxCamW = MAP_X - 1;
+		if (maxCamH == MAP_Y) maxCamH = MAP_Y - 1;
+	}
+}
+
+void Game::setCamera()
+{
+	maxCamY = (int)ceil(camera->y / TILE_SIZE);
+	maxCamH = (int)(((ceil(camera->y / TILE_SIZE) + ceil(camera->h / TILE_SIZE)) < MAP_Y - 1) ? ceil(camera->y / TILE_SIZE) + ceil(camera->h / TILE_SIZE) + 1 : ceil(camera->y / TILE_SIZE) + ceil(camera->h / TILE_SIZE));
+	maxCamX = (int)ceil(camera->x / TILE_SIZE);
+	maxCamW = (int)(((ceil(camera->x / TILE_SIZE) + ceil(camera->w / TILE_SIZE)) < MAP_X - 1) ? ceil(camera->x / TILE_SIZE) + ceil(camera->w / TILE_SIZE) + 1 : ceil(camera->x / TILE_SIZE) + ceil(camera->w / TILE_SIZE));
 }
 
 bool Game::running()
@@ -186,7 +209,7 @@ void Game::buildButtons()
 		.setCamera(camera)
 		.setPosition(250, 250)
 		.setSize(50, 50)
-		.setText("Off", { 255,255,0 }, fontManager[18]);
+		.setText("Off", { 255,192,0 }, fontManager[18]);
 	b.setImage("bin/images/button.png")
 		.setCamera(camera)
 		.setPosition(350, 250)

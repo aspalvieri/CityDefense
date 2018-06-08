@@ -24,6 +24,7 @@ public:
 	void handleEvents();
 	void update();
 	void render();
+	void cameraEvents(SDL_Event *e);
 	void setCamera();
 	void moveCamera();
 
@@ -42,6 +43,7 @@ private:
 	bool quit = false, up = false, down = false, right = false, left = false;
 	SDL_Rect *camera;
 	int camSpeed = 8;
+	double xspeed = 0, yspeed = 0, posx, posy;
 
 	//Static variables
 	pair<int, int> *mousePos;
