@@ -7,12 +7,28 @@ void Game::handleEvents()
 		//Update the user's mouse properties
 		if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) {
 			*mouseButton = SDL_GetMouseState(&mousePos->first, &mousePos->second);
-			if (currentObject) {
-				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
-				if (e.type == SDL_MOUSEBUTTONDOWN) {
-					objects.push_back(new Object(*currentObject));
-					currentObject = NULL;
+		}
+
+		//Move this autism
+		if (currentObject) {
+			currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
+			currentObject->canPlace = true;
+			for (int y = maxCamY; y <= maxCamH; y++) {
+				for (int x = maxCamX; x <= maxCamW; x++) {
+					if (tiles[x][y]->getCollide() && checkCollision(&currentObject->self.getBox(), &tiles[x][y]->getBox())) {
+						currentObject->canPlace = false;
+					}
 				}
+			}
+			for (auto & object : objects) {
+				if (object->getCollide() && checkCollision(camera, &object->self.getBox())
+					&& checkCollision(&currentObject->self.getBox(), &object->self.getBox())) {
+					currentObject->canPlace = false;
+				}
+			}
+			if (currentObject->canPlace && e.type == SDL_MOUSEBUTTONDOWN) {
+				objects.push_back(new Object(*currentObject));
+				currentObject = NULL;
 			}
 		}
 
@@ -30,10 +46,23 @@ void Game::handleEvents()
 			case SDLK_1:
 				currentObject = new Object(powerPlant, false);
 				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
+				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
+				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
 				break;
 			case SDLK_2:
 				currentObject = new Object(reactor, false);
 				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
+				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
+				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
+				break;
+			case SDLK_3:
+				currentObject = new Object(deleteObject, false);
+				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
+				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
+				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
+				break;
+			case SDLK_g:
+				mapfunc->generateMap(&tilesForest);
 				break;
 			case SDLK_ESCAPE:
 				quit = true;
@@ -75,8 +104,15 @@ void Game::render()
 		sprite->draw();
 	}
 
-	if (currentObject)
+	if (currentObject) {
 		currentObject->self.draw();
+		if (currentObject->canPlace) {
+			canPlace.render(currentObject->self.getBox().x - camera->x, currentObject->self.getBox().y - camera->y);
+		}
+		if (!currentObject->canPlace) {
+			cantPlace.render(currentObject->self.getBox().x - camera->x, currentObject->self.getBox().y - camera->y);
+		}
+	}
 	
 	SDL_RenderPresent(gRenderer);
 }
@@ -264,11 +300,22 @@ void Game::buildImages()
 		.pushFrameRow("Idle", 0, 0, 100, 0, 6)
 		.setAnimation("Idle");
 
+	deleteSprite.loadSpriteImage("bin/images/delete.png")
+		.setCamera(camera)
+		.setFrameSize(96, 64)
+		.setSize(TILE_SIZE * 2, TILE_SIZE * 1)
+		.setDelay(3)
+		.pushFrameRow("Idle", 0, 0, 96, 0, 2)
+		.setAnimation("Idle");
+
 	tilesForest.loadImage("bin/images/tilesheetforest.png");
+	canPlace.loadImage("bin/images/greenpixel.png");
+	cantPlace.loadImage("bin/images/redpixel.png");
 }
 
 void Game::buildObjects()
 {
 	powerPlant.self = powerPlantSprite;
 	reactor.self = reactorSprite;
+	deleteObject.self = deleteSprite;
 }

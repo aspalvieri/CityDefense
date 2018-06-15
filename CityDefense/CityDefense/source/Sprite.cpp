@@ -231,7 +231,7 @@ Sprite & Sprite::draw()
 		clip.h = frameSize.second;
 		if (camera == NULL)
 			images[location].render(x, y, &clip, angle, &center);
-		else if (camera != NULL && checkCollision(box, *camera))
+		else if (camera != NULL && checkCollision(&box, camera))
 			images[location].render(x - camera->x, y - camera->y, &clip, angle, &center);
 	}
 	return *this;
@@ -296,7 +296,7 @@ std::string Sprite::getName()
 	return spriteName;
 }
 
-bool checkCollision(SDL_Rect &A, SDL_Rect &B)
+bool checkCollision(SDL_Rect *A, SDL_Rect *B)
 {
 	//The sides of the rectangles
 	int leftA, leftB;
@@ -305,16 +305,16 @@ bool checkCollision(SDL_Rect &A, SDL_Rect &B)
 	int bottomA, bottomB;
 
 	//Calculate the sides of rect A
-	leftA = A.x;
-	rightA = A.x + A.w;
-	topA = A.y;
-	bottomA = A.y + A.h;
+	leftA = A->x;
+	rightA = A->x + A->w;
+	topA = A->y;
+	bottomA = A->y + A->h;
 
 	//Calculate the sides of rect B
-	leftB = B.x;
-	rightB = B.x + B.w;
-	topB = B.y;
-	bottomB = B.y + B.h;
+	leftB = B->x;
+	rightB = B->x + B->w;
+	topB = B->y;
+	bottomB = B->y + B->h;
 
 	//If any of the sides from A are outside of B
 	if (bottomA <= topB)

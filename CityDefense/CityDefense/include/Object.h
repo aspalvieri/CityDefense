@@ -12,9 +12,11 @@ public:
 
 	void move(double x, double y);
 	void moveToMouse(double x, double y, bool snapToGrid = true);
+	bool getCollide();
 
 //private:
 	Sprite self;
+	bool canPlace = true, collide;
 };
 
 #endif//OBJECT_H

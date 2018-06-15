@@ -12,6 +12,7 @@ public:
 
 	void draw();
 	bool getCollide();
+	SDL_Rect getBox();
 
 private:
 	bool collide;

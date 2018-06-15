@@ -27,3 +27,8 @@ bool Tile::getCollide()
 {
 	return collide;
 }
+
+SDL_Rect Tile::getBox()
+{
+	return { x, y, clip.w, clip.h };
+}

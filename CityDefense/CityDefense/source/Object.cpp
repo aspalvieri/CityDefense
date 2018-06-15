@@ -2,6 +2,7 @@
 
 Object::Object()
 {
+	collide = true;
 }
 
 Object::Object(const Object & o, bool addToManager)
@@ -34,4 +35,9 @@ void Object::moveToMouse(double x, double y, bool snapToGrid)
 	else {
 		self.setPosition(x - self.getCenter().x, y - self.getCenter().y);
 	}
+}
+
+bool Object::getCollide()
+{
+	return collide;
 }

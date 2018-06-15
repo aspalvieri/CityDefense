@@ -49,8 +49,11 @@ public:
 	vector<Object*> objects;
 	Object *currentObject = NULL;
 
+	Sprite deleteSprite;
+	Object deleteObject;
+
 	//Tilesheet
-	Texture tilesForest;
+	Texture tilesForest, canPlace, cantPlace;
 	Tile *tiles[MAP_X][MAP_Y];
 	int maxCamX, maxCamY, maxCamH, maxCamW;
 
