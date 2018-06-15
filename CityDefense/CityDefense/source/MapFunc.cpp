@@ -11,6 +11,12 @@ MapFunc::MapFunc(Game * game)
 
 void MapFunc::clearMap()
 {
+	for (unsigned int i = 0; i < game->objects.size(); i++) {
+		game->objects[i]->self.removeFromManager();
+	}
+	if (!game->objects.empty())
+		game->objects.clear();
+
 	for (int y = 0; y < MAP_Y; y++) {
 		for (int x = 0; x < MAP_X; x++) {
 			delete game->tiles[x][y];
@@ -29,6 +35,7 @@ void MapFunc::generateMap(Texture * tilesheet)
 		}
 	}
 
+	//Spawn bodies of water
 	int totalbodies = game->randomInt(45, 50);
 	for (int i = 0; i < totalbodies; i++) {
 		int waterspotx = game->randomInt(0, MAP_X - 1);
@@ -54,6 +61,28 @@ void MapFunc::generateMap(Texture * tilesheet)
 				}
 			}
 			size--;
+		}
+	}
+
+	//Spawn rocks
+	int totalrocks = game->randomInt(100, 150);
+	while (totalrocks > 0) {
+		int spx = game->randomInt(0, MAP_X - 1);
+		int spy = game->randomInt(0, MAP_Y - 1);
+		if (!game->tiles[spx][spy]->getCollide()) {
+			game->rocks.self.setPosition(spx * TILE_SIZE, spy * TILE_SIZE);
+			bool hit = false;
+			for (unsigned int i = 0; i < game->objects.size(); i++) {
+				if (game->objects[i]->getCollide() && checkCollision(&game->rocks.self.getBox(), &game->objects[i]->self.getBox())) {
+					hit = true;
+				}
+			}
+			if (!hit) {
+				game->objects.push_back(new Object(game->rocks));
+				game->objects.back()->self.setFrame(game->randomInt(0, 2));
+				totalrocks--;
+				continue;
+			}
 		}
 	}
 }

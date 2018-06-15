@@ -15,6 +15,8 @@ public:
 
 	Sprite& addToManager();
 
+	Sprite& removeFromManager();
+
 	Sprite& loadSpriteImage(std::string fileLocation);
 
 	Sprite& setFrameSize(int width, int height);
@@ -60,6 +62,9 @@ public:
 	bool getCollide();
 
 	Sprite& nextFrame();
+
+	Sprite& setEnabled(bool e);
+	bool getEnabled();
 
 	bool finishedAnimation();
 
@@ -107,7 +112,7 @@ private:
 	int currentFrame;
 	int delay, ticks;
 	double angle;
-	bool collide, visible, inManager;
+	bool collide, visible, inManager, enabled;
 
 	// This was the file location of the image we loaded
 	std::string location;

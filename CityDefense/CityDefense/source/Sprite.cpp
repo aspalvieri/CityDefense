@@ -16,6 +16,7 @@ Sprite::Sprite()
 	collide = false;
 	visible = true;
 	inManager = false;
+	enabled = true;
 }
 
 Sprite::~Sprite()
@@ -29,6 +30,14 @@ Sprite & Sprite::addToManager()
 {
 	Sprite::spriteManager.push_back(this);
 	inManager = true;
+	return *this;
+}
+
+Sprite & Sprite::removeFromManager()
+{
+	if (inManager) {
+		Sprite::spriteManager.erase(remove(Sprite::spriteManager.begin(), Sprite::spriteManager.end(), this), Sprite::spriteManager.end());
+	}
 	return *this;
 }
 
@@ -128,6 +137,7 @@ int Sprite::getCurrentAnimationSize()
 Sprite & Sprite::setFrame(int frame)
 {
 	currentFrame = frame;
+	ticks = 0;
 	return *this;
 }
 
@@ -185,7 +195,7 @@ bool Sprite::getCollide()
 
 Sprite & Sprite::nextFrame()
 {
-	if (visible) {
+	if (visible && enabled) {
 		if (ticks == delay)
 		{
 			currentFrame++;
@@ -197,6 +207,17 @@ Sprite & Sprite::nextFrame()
 		}
 	}
 	return *this;
+}
+
+Sprite & Sprite::setEnabled(bool e)
+{
+	enabled = e;
+	return *this;
+}
+
+bool Sprite::getEnabled()
+{
+	return enabled;
 }
 
 bool Sprite::finishedAnimation()

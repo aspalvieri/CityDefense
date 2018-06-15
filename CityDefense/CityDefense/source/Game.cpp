@@ -300,6 +300,14 @@ void Game::buildImages()
 		.pushFrameRow("Idle", 0, 0, 100, 0, 6)
 		.setAnimation("Idle");
 
+	rockSprite.loadSpriteImage("bin/images/rock.png")
+		.setCamera(camera)
+		.setEnabled(false)
+		.setFrameSize(32, 32)
+		.setSize(TILE_SIZE, TILE_SIZE)
+		.pushFrameRow("Idle", 0, 0, 32, 0, 3)
+		.setAnimation("Idle");
+
 	deleteSprite.loadSpriteImage("bin/images/delete.png")
 		.setCamera(camera)
 		.setFrameSize(96, 64)
@@ -318,4 +326,5 @@ void Game::buildObjects()
 	powerPlant.self = powerPlantSprite;
 	reactor.self = reactorSprite;
 	deleteObject.self = deleteSprite;
+	rocks.self = rockSprite;
 }
