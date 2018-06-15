@@ -7,6 +7,13 @@ void Game::handleEvents()
 		//Update the user's mouse properties
 		if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) {
 			*mouseButton = SDL_GetMouseState(&mousePos->first, &mousePos->second);
+			if (currentObject) {
+				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
+				if (e.type == SDL_MOUSEBUTTONDOWN) {
+					objects.push_back(new Object(*currentObject));
+					currentObject = NULL;
+				}
+			}
 		}
 
 		//Handle events for camera
@@ -20,6 +27,14 @@ void Game::handleEvents()
 		//User presses a key down
 		if (e.type == SDL_KEYDOWN) {
 			switch (e.key.keysym.sym) {
+			case SDLK_1:
+				currentObject = new Object(powerPlant, false);
+				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
+				break;
+			case SDLK_2:
+				currentObject = new Object(reactor, false);
+				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
+				break;
 			case SDLK_ESCAPE:
 				quit = true;
 				break;
@@ -29,17 +44,6 @@ void Game::handleEvents()
 		//User presses exit
 		if (e.type == SDL_QUIT)
 			quit = true;
-
-		if (a.Pressed()) {
-			b.setVisible(true);
-			a.setVisible(false);
-			g.setVisible(false);
-		}
-		if (b.Pressed()) {
-			a.setVisible(true);
-			b.setVisible(false);
-			g.setVisible(true);
-		}
 	}
 }
 
@@ -48,6 +52,9 @@ void Game::update()
 	for (auto & sprite : Sprite::spriteManager) {
 		sprite->nextFrame();
 	}
+
+	if (currentObject)
+		currentObject->self.nextFrame();
 
 	moveCamera();
 }
@@ -68,8 +75,8 @@ void Game::render()
 		sprite->draw();
 	}
 
-	a.render();
-	b.render();
+	if (currentObject)
+		currentObject->self.draw();
 	
 	SDL_RenderPresent(gRenderer);
 }
@@ -79,12 +86,10 @@ void Game::initialize()
 	buildFontManager();
 	buildButtons();
 	buildImages();
+	buildObjects();
 
-	for (int y = 0; y < MAP_Y; y++) {
-		for (int x = 0; x < MAP_X; x++) {
-			tiles[x][y] = new Tile(&tilesForest, TILE_GRASS, x * TILE_SIZE, y * TILE_SIZE);
-		}
-	}
+	mapfunc = new MapFunc(this);
+	mapfunc->generateMap(&tilesForest);
 	
 	setCamera();
 }
@@ -161,6 +166,8 @@ void Game::cameraEvents(SDL_Event * e)
 void Game::moveCamera()
 {
 	if (up || down || left || right) {
+		if (currentObject)
+			currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
 		xspeed = (right - left) * camSpeed;
 		yspeed = (down - up) * camSpeed;
 		if (xspeed != 0 && yspeed != 0) {
@@ -189,47 +196,19 @@ void Game::setCamera()
 	maxCamW = (int)(((ceil(camera->x / TILE_SIZE) + ceil(camera->w / TILE_SIZE)) < MAP_X - 1) ? ceil(camera->x / TILE_SIZE) + ceil(camera->w / TILE_SIZE) + 1 : ceil(camera->x / TILE_SIZE) + ceil(camera->w / TILE_SIZE));
 }
 
+int Game::randomInt(int min, int max)
+{
+	return uniform_int_distribution<int>{min, max}(rng);
+}
+
+double Game::randomDouble(double min, double max)
+{
+	return uniform_real_distribution<double>{min, max}(rng);
+}
+
 bool Game::running()
 {
 	return !quit;
-}
-
-void Game::buildFontManager()
-{
-	//Load font sizes into fontManager for later use
-	for (int i = 12; i <= 24; i+=2)
-	{
-		fontManager[i] = TTF_OpenFont("bin/fonts/codenewroman.ttf", i);
-	}
-}
-
-void Game::buildButtons()
-{
-	a.setImage("bin/images/button.png")
-		.setCamera(camera)
-		.setPosition(250, 250)
-		.setSize(50, 50)
-		.setText("Off", { 255,192,0 }, fontManager[18]);
-	b.setImage("bin/images/button.png")
-		.setCamera(camera)
-		.setPosition(350, 250)
-		.setSize(50, 50)
-		.setText("On", { 0,255,0 }, fontManager[18])
-		.setVisible(false);
-}
-
-void Game::buildImages()
-{
-	g.loadSpriteImage("bin/images/weaponforge.png")
-		.setCamera(camera)
-		.setFrameSize(100, 100)
-		.setSize(100, 100)
-		.setDelay(3)
-		.pushFrameRow("Idle", 0, 0, 100, 0, 7)
-		.pushFrameRow("Idle", 0, 100, 100, 0, 7)
-		.setAnimation("Idle");
-
-	tilesForest.loadImage("bin/images/tilesheetforest.png");
 }
 
 void Game::destroy()
@@ -246,3 +225,50 @@ void Game::destroy()
 	SDL_Quit();
 }
 
+void Game::buildFontManager()
+{
+	//Load font sizes into fontManager for later use
+	for (int i = 12; i <= 24; i+=2)
+	{
+		fontManager[i] = TTF_OpenFont("bin/fonts/codenewroman.ttf", i);
+	}
+}
+
+void Game::buildButtons()
+{
+	/*
+	a.setImage("bin/images/button.png")
+		.setCamera(camera)
+		.setPosition(300, 250)
+		.setSize(50, 50)
+		.setText("Off", { 255,192,0 }, fontManager[18]);
+		*/
+}
+
+void Game::buildImages()
+{
+	powerPlantSprite.loadSpriteImage("bin/images/powerplant.png")
+		.setCamera(camera)
+		.setFrameSize(100, 100)
+		.setSize(TILE_SIZE * 2, TILE_SIZE * 2)
+		.setDelay(3)
+		.pushFrameRow("Idle", 0, 0, 100, 0, 7)
+		.pushFrameRow("Idle", 0, 100, 100, 0, 7)
+		.setAnimation("Idle");
+
+	reactorSprite.loadSpriteImage("bin/images/reactor.png")
+		.setCamera(camera)
+		.setFrameSize(100, 100)
+		.setSize(TILE_SIZE * 2, TILE_SIZE * 2)
+		.setDelay(3)
+		.pushFrameRow("Idle", 0, 0, 100, 0, 6)
+		.setAnimation("Idle");
+
+	tilesForest.loadImage("bin/images/tilesheetforest.png");
+}
+
+void Game::buildObjects()
+{
+	powerPlant.self = powerPlantSprite;
+	reactor.self = reactorSprite;
+}

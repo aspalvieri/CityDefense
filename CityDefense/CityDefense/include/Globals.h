@@ -4,8 +4,8 @@
 #define SCREEN_WIDTH		1280
 #define SCREEN_HEIGHT		720
 
-#define MAP_X		50
-#define MAP_Y		50
+#define MAP_X		100
+#define MAP_Y		100
 #define TILE_SIZE	32
 
 //Tiles

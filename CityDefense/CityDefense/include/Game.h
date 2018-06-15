@@ -5,6 +5,10 @@
 #include "Sprite.h"
 #include "Button.h"
 #include "Tile.h"
+#include "MapFunc.h"
+#include "Object.h"
+
+class MapFunc;
 
 class Game
 {
@@ -18,6 +22,7 @@ public:
 	void buildFontManager();
 	void buildButtons();
 	void buildImages();
+	void buildObjects();
 	void destroy();
 
 	//Main game
@@ -28,11 +33,21 @@ public:
 	void setCamera();
 	void moveCamera();
 
+	//Randomize
+	int randomInt(int min, int max);
+	double randomDouble(double min, double max);
+
 	bool running();
 
-private:
-	Button a, b;
-	Sprite g;
+
+//*************
+//	Variables
+//*************
+	Sprite powerPlantSprite, reactorSprite;
+	Object powerPlant, reactor;
+
+	vector<Object*> objects;
+	Object *currentObject = NULL;
 
 	//Tilesheet
 	Texture tilesForest;
@@ -42,8 +57,13 @@ private:
 	//Primary variable
 	bool quit = false, up = false, down = false, right = false, left = false;
 	SDL_Rect *camera;
-	int camSpeed = 8;
+	int camSpeed = 12;
 	double xspeed = 0, yspeed = 0, posx, posy;
+
+	//Random device
+	random_device rd;
+	mt19937 rng{rd()};
+	MapFunc *mapfunc;
 
 	//Static variables
 	pair<int, int> *mousePos;

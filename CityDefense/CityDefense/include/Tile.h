@@ -7,12 +7,14 @@ class Tile
 {
 public:
 	Tile();
-	Tile(Texture *tilesheet, SDL_Rect c, int x, int y);
+	Tile(Texture *tilesheet, SDL_Rect c, int x, int y, bool col);
 	~Tile();
 
 	void draw();
+	bool getCollide();
 
 private:
+	bool collide;
 	Texture * tilesheet;
 	SDL_Rect clip, *camera;
 	int x, y;

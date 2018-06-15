@@ -15,13 +15,21 @@ Sprite::Sprite()
 	box = { 0, 0, 0, 0 }; //X, Y, W, H
 	collide = false;
 	visible = true;
-
-	Sprite::spriteManager.push_back(this);
+	inManager = false;
 }
 
 Sprite::~Sprite()
 {
-	Sprite::spriteManager.erase(remove(Sprite::spriteManager.begin(), Sprite::spriteManager.end(), this), Sprite::spriteManager.end());
+	if (inManager) {
+		Sprite::spriteManager.erase(remove(Sprite::spriteManager.begin(), Sprite::spriteManager.end(), this), Sprite::spriteManager.end());
+	}
+}
+
+Sprite & Sprite::addToManager()
+{
+	Sprite::spriteManager.push_back(this);
+	inManager = true;
+	return *this;
 }
 
 Sprite& Sprite::loadSpriteImage(std::string fileLocation)
@@ -177,14 +185,16 @@ bool Sprite::getCollide()
 
 Sprite & Sprite::nextFrame()
 {
-	if (ticks == delay)
-	{
-		currentFrame++;
-		ticks = 0;
-	}
-	else
-	{
-		ticks++;
+	if (visible) {
+		if (ticks == delay)
+		{
+			currentFrame++;
+			ticks = 0;
+		}
+		else
+		{
+			ticks++;
+		}
 	}
 	return *this;
 }
@@ -252,6 +262,11 @@ Sprite & Sprite::setCamera(SDL_Rect * cam)
 {
 	camera = cam;
 	return *this;
+}
+
+SDL_Rect * Sprite::getCamera()
+{
+	return camera;
 }
 
 SDL_Texture * Sprite::getTexture()

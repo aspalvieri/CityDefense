@@ -13,6 +13,8 @@ public:
 	//All sprites are added to this on creation, removed on deletion
 	static vector<Sprite*> spriteManager;
 
+	Sprite& addToManager();
+
 	Sprite& loadSpriteImage(std::string fileLocation);
 
 	Sprite& setFrameSize(int width, int height);
@@ -74,6 +76,7 @@ public:
 	Sprite& setSprite(Sprite s);
 
 	Sprite& setCamera(SDL_Rect *cam = NULL);
+	SDL_Rect * getCamera();
 
 	SDL_Texture* getTexture();
 
@@ -104,7 +107,7 @@ private:
 	int currentFrame;
 	int delay, ticks;
 	double angle;
-	bool collide, visible;
+	bool collide, visible, inManager;
 
 	// This was the file location of the image we loaded
 	std::string location;

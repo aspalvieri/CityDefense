@@ -121,6 +121,8 @@
     <ClCompile Include="source\Button.cpp" />
     <ClCompile Include="source\Game.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\MapFunc.cpp" />
+    <ClCompile Include="source\Object.cpp" />
     <ClCompile Include="source\SDLR.cpp" />
     <ClCompile Include="source\Sprite.cpp" />
     <ClCompile Include="source\Texture.cpp" />
@@ -131,6 +133,8 @@
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\Globals.h" />
     <ClInclude Include="include\Includes.h" />
+    <ClInclude Include="include\MapFunc.h" />
+    <ClInclude Include="include\Object.h" />
     <ClInclude Include="include\SDLR.h" />
     <ClInclude Include="include\Sprite.h" />
     <ClInclude Include="include\Texture.h" />
