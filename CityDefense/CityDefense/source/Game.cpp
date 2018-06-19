@@ -12,7 +12,8 @@ void Game::handleEvents()
 		//Move this autism
 		if (currentObject) {
 			currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
-			currentObject->canPlace = true;
+			currentObject->canPlace = currentObject->defaultPlace;
+
 			for (int y = maxCamY; y <= maxCamH; y++) {
 				for (int x = maxCamX; x <= maxCamW; x++) {
 					if (tiles[x][y]->getCollide() && checkCollision(&currentObject->self.getBox(), &tiles[x][y]->getBox())) {
@@ -22,12 +23,19 @@ void Game::handleEvents()
 			}
 			for (auto & object : objects) {
 				if (object->getCollide() && checkCollision(camera, &object->self.getBox())
-					&& checkCollision(&currentObject->self.getBox(), &object->self.getBox())) {
+					&& checkCollision(&currentObject->self.getBox(), &object->self.getBox())) 
+				{
+					if (currentObject->requiredType != "" && object->type == currentObject->requiredType && isEqualBox(&object->self.getBox(), &currentObject->self.getBox())) {
+						currentObject->canPlace = true;
+						continue;
+					}
 					currentObject->canPlace = false;
 				}
 			}
 			if (currentObject->canPlace && e.type == SDL_MOUSEBUTTONDOWN) {
 				objects.push_back(new Object(*currentObject));
+				objects.back()->self.setFrame(currentObject->self.getFrame());
+				delete currentObject;
 				currentObject = NULL;
 			}
 		}
@@ -44,19 +52,29 @@ void Game::handleEvents()
 		if (e.type == SDL_KEYDOWN) {
 			switch (e.key.keysym.sym) {
 			case SDLK_1:
+				delete currentObject;
 				currentObject = new Object(powerPlant, false);
 				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
 				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
 				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
 				break;
 			case SDLK_2:
+				delete currentObject;
 				currentObject = new Object(reactor, false);
 				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
 				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
 				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
 				break;
 			case SDLK_3:
+				delete currentObject;
 				currentObject = new Object(deleteObject, false);
+				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
+				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
+				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
+				break;
+			case SDLK_4:
+				delete currentObject;
+				currentObject = new Object(rockMiner, false);
 				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
 				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
 				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
@@ -303,15 +321,27 @@ void Game::buildImages()
 	rockSprite.loadSpriteImage("bin/images/rock.png")
 		.setCamera(camera)
 		.setEnabled(false)
+		.setFrameSize(TILE_SIZE, TILE_SIZE)
+		.setSize(TILE_SIZE, TILE_SIZE)
+		.pushFrameRow("Idle", 0, 0, TILE_SIZE, 0, 3)
+		.setAnimation("Idle");
+
+	minerSprite.loadSpriteImage("bin/images/weakminer.png")
+		.setCamera(camera)
 		.setFrameSize(32, 32)
 		.setSize(TILE_SIZE, TILE_SIZE)
-		.pushFrameRow("Idle", 0, 0, 32, 0, 3)
+		.setDelay(6)
+		.pushFrameRow("Idle", 0, 0, 32, 0, 6)
+		.pushFrameRow("Idle", 0, 32, 32, 0, 6)
+		.pushFrameRow("Idle", 0, 64, 32, 0, 6)
+		.pushFrameRow("Idle", 0, 96, 32, 0, 6)
+		.pushFrameRow("Idle", 0, 128, 32, 0, 6)
 		.setAnimation("Idle");
 
 	deleteSprite.loadSpriteImage("bin/images/delete.png")
 		.setCamera(camera)
 		.setFrameSize(96, 64)
-		.setSize(TILE_SIZE * 2, TILE_SIZE * 1)
+		.setSize(TILE_SIZE * 3, TILE_SIZE * 1)
 		.setDelay(3)
 		.pushFrameRow("Idle", 0, 0, 96, 0, 2)
 		.setAnimation("Idle");
@@ -324,7 +354,15 @@ void Game::buildImages()
 void Game::buildObjects()
 {
 	powerPlant.self = powerPlantSprite;
+
 	reactor.self = reactorSprite;
+
 	deleteObject.self = deleteSprite;
+
 	rocks.self = rockSprite;
+	rocks.type = "Rock";
+
+	rockMiner.self = minerSprite;
+	rockMiner.requiredType = "Rock";
+	rockMiner.defaultPlace = false;
 }

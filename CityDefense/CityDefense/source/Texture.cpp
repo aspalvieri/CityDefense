@@ -8,7 +8,7 @@ Texture::Texture()
 
 Texture::~Texture()
 {
-	free();
+	//free();
 }
 
 bool Texture::loadImage(string path)

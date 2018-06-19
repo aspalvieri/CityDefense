@@ -16,7 +16,8 @@ public:
 
 //private:
 	Sprite self;
-	bool canPlace = true, collide;
+	string type = "", requiredType = "";
+	bool canPlace = true, collide, defaultPlace = true;
 };
 
 #endif//OBJECT_H

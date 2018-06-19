@@ -409,3 +409,9 @@ bool checkCollision(Circle &a, SDL_Rect &b)
 
 	return false;
 }
+
+bool isEqualBox(SDL_Rect *a, SDL_Rect *b) {
+	if (a->x == b->x && a->y == b->y && a->w == b->w && a->h == b->h)
+		return true;
+	return false;
+}

@@ -43,8 +43,8 @@ public:
 //*************
 //	Variables
 //*************
-	Sprite powerPlantSprite, reactorSprite, rockSprite;
-	Object powerPlant, reactor, rocks;
+	Sprite powerPlantSprite, reactorSprite, rockSprite, minerSprite;
+	Object powerPlant, reactor, rocks, rockMiner;
 
 	vector<Object*> objects;
 	Object *currentObject = NULL;

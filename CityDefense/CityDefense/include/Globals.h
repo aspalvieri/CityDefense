@@ -8,8 +8,13 @@
 #define MAP_Y		100
 #define TILE_SIZE	32
 
+#define FIELD_X (MAP_X*TILE_SIZE)
+#define FIELD_Y (MAP_Y*TILE_SIZE)
+
 //Tiles
 #define TILE_GRASS	{0, 0, TILE_SIZE, TILE_SIZE}
 #define TILE_WATER	{32, 0, TILE_SIZE, TILE_SIZE}
+#define TILE_SAND	{0, 32, TILE_SIZE, TILE_SIZE}
+#define TILE_SHORE	{32, 32, TILE_SIZE, TILE_SIZE}
 
 #endif//GLOBALS_H
