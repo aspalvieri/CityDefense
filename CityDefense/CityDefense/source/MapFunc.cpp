@@ -107,8 +107,8 @@ void MapFunc::generateMap(Texture * tilesheet)
 	//Spawn rocks
 	int totalrocks = game->randomInt(200, 250);
 	while (totalrocks > 0) {
-		int spx = game->randomInt(0, MAP_X - 2);
-		int spy = game->randomInt(0, MAP_Y - 2);
+		int spx = game->randomInt(0, MAP_X - 1);
+		int spy = game->randomInt(0, MAP_Y - 1);
 		if (!game->tiles[spx][spy]->getCollide() && *game->tiles[spx][spy] == grass) {
 			game->rocks.self.setPosition(spx * TILE_SIZE, spy * TILE_SIZE);
 			bool hit = false;

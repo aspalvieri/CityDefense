@@ -47,3 +47,10 @@ bool Tile::operator==(const SDL_Rect & other)
 		return true;
 	return false;
 }
+
+bool Tile::operator!=(const SDL_Rect & other)
+{
+	if (clip.x == other.x && clip.y == other.y && clip.w == other.w && clip.h == other.h)
+		return false;
+	return true;
+}

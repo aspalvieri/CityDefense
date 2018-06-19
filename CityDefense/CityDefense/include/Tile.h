@@ -16,6 +16,7 @@ public:
 
 	bool operator==(const Tile& other);
 	bool operator==(const SDL_Rect& other);
+	bool operator!=(const SDL_Rect& other);
 
 private:
 	bool collide, walkable;
