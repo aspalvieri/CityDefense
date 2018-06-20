@@ -32,7 +32,7 @@ void Game::handleEvents()
 					currentObject->canPlace = false;
 				}
 			}
-			if (currentObject->canPlace && e.type == SDL_MOUSEBUTTONDOWN) {
+			if (currentObject->canPlace && e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
 				objects.push_back(new Object(*currentObject));
 				objects.back()->self.setFrame(currentObject->self.getFrame());
 				delete currentObject;
