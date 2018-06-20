@@ -82,6 +82,16 @@ void Game::handleEvents()
 			case SDLK_g:
 				mapfunc->generateMap(&tilesForest);
 				break;
+			case SDLK_t:
+				for (int y = 0; y < MAP_Y; y++) {
+					for (int x = 0; x < MAP_X; x++) {
+						if (!tiles[x][y]->gridline)
+							tiles[x][y]->gridline = &gridline;
+						else
+							tiles[x][y]->gridline = NULL;
+					}
+				}
+				break;
 			case SDLK_ESCAPE:
 				quit = true;
 				break;
@@ -122,6 +132,8 @@ void Game::render()
 		sprite->draw();
 	}
 
+
+	//Make a class for this, or functions
 	if (currentObject) {
 		currentObject->self.draw();
 		if (currentObject->canPlace) {
@@ -129,6 +141,14 @@ void Game::render()
 		}
 		if (!currentObject->canPlace) {
 			cantPlace.render(currentObject->self.getBox().x - camera->x, currentObject->self.getBox().y - camera->y);
+		}
+	}
+
+	//Render all gridlines (if turned on)
+	for (int y = maxCamY; y <= maxCamH; y++) {
+		for (int x = maxCamX; x <= maxCamW; x++) {
+			if (tiles[x][y]->gridline)
+				tiles[x][y]->gridline->render(tiles[x][y]->getBox().x - camera->x, tiles[x][y]->getBox().y - camera->y);
 		}
 	}
 	
@@ -323,7 +343,7 @@ void Game::buildImages()
 		.setEnabled(false)
 		.setFrameSize(TILE_SIZE, TILE_SIZE)
 		.setSize(TILE_SIZE, TILE_SIZE)
-		.pushFrameRow("Idle", 0, 0, TILE_SIZE, 0, 3)
+		.pushFrameRow("Idle", 0, 0, TILE_SIZE, 0, 4)
 		.setAnimation("Idle");
 
 	minerSprite.loadSpriteImage("bin/images/weakminer.png")
@@ -349,6 +369,7 @@ void Game::buildImages()
 	tilesForest.loadImage("bin/images/tilesheetforest.png");
 	canPlace.loadImage("bin/images/greenpixel.png");
 	cantPlace.loadImage("bin/images/redpixel.png");
+	gridline.loadImage("bin/images/gridline.png");
 }
 
 void Game::buildObjects()

@@ -18,6 +18,7 @@ public:
 	bool operator==(const SDL_Rect& other);
 	bool operator!=(const SDL_Rect& other);
 
+	Texture *gridline = NULL;
 private:
 	bool collide, walkable;
 	Texture * tilesheet;

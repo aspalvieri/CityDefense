@@ -53,7 +53,7 @@ public:
 	Object deleteObject;
 
 	//Tilesheet
-	Texture tilesForest, canPlace, cantPlace;
+	Texture tilesForest, canPlace, cantPlace, gridline;
 	Tile *tiles[MAP_X][MAP_Y];
 	int maxCamX, maxCamY, maxCamH, maxCamW;
 

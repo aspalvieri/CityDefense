@@ -46,14 +46,15 @@ void MapFunc::generateMap(Texture * tilesheet)
 	SDL_Rect sand = TILE_SAND;
 	bool first = true;
 	for (int i = 0; i < totalbodies; i++) {
-		int waterspotx = game->randomInt(0, MAP_X - 1);
-		int waterspoty = game->randomInt(0, MAP_Y - 1);
+		int size = game->randomInt(2, 4);
+		int smax = size;
+
+		int waterspotx = game->randomInt(2 + size, MAP_X - size - 3);
+		int waterspoty = game->randomInt(2 + size, MAP_Y - size - 3);
 		if (!game->tiles[waterspotx][waterspoty]->getCollide()) {
 			i--;
 			continue;
 		}
-		int size = game->randomInt(2, 4);
-		int smax = size;
 		while (size != 0) {
 			int wsx = ((waterspotx - size) > 0) ? waterspotx - size : 0;
 			int wsy = ((waterspoty - size) > 0) ? waterspoty - size : 0;
@@ -119,7 +120,7 @@ void MapFunc::generateMap(Texture * tilesheet)
 			}
 			if (!hit) {
 				game->objects.push_back(new Object(game->rocks));
-				game->objects.back()->self.setFrame(game->randomInt(0, 2));
+				game->objects.back()->self.setFrame(game->randomInt(0, 3));
 				totalrocks--;
 				continue;
 			}
