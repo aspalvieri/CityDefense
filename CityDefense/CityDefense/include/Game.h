@@ -47,13 +47,18 @@ public:
 	Object powerPlant, reactor, rocks, rockMiner;
 
 	vector<Object*> objects;
+	vector<tuple<Button*, Sprite, Object*>> buttonObjects;
+	Button cancelButton, mapgenButton;
 	Object *currentObject = NULL;
+	bool hideObject = false, multiPlace = false, placedOnce = false;
+
+	Button uiButton;
 
 	Sprite deleteSprite;
 	Object deleteObject;
 
 	//Tilesheet
-	Texture tilesForest, canPlace, cantPlace, gridline;
+	Texture tilesForest, canPlace, cantPlace, gridline, uipanel, uibg;
 	Tile *tiles[MAP_X][MAP_Y];
 	int maxCamX, maxCamY, maxCamH, maxCamW;
 

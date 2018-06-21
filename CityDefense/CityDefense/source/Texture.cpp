@@ -68,7 +68,7 @@ bool Texture::loadFont(std::string textureText, SDL_Color textColor, TTF_Font * 
 
 void Texture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
-	SDL_Rect renderQuad = { x, y, (int)scaleWidth, (int)scaleHeight };
+	SDL_Rect renderQuad = { x, y, (int)width, (int)height };
 
 	//Set clip rendering dimensions
 	if (clip != NULL) {

@@ -11,6 +11,10 @@ public:
 
 	static vector<Button*> buttonManager;
 
+	Button& addToManager();
+
+	Button& removeFromManager();
+
 	Button& setText(string t, SDL_Color = { 255,255,255 }, TTF_Font* = NULL);
 
 	Button& setSize(double w, double h);
@@ -20,10 +24,11 @@ public:
 	Button& setImage(string path);
 
 	Button& setImage(Texture img);
+	Texture& getImage();
 
 	Button& setCamera(SDL_Rect *cam = NULL);
 
-	void setVisible(bool v);
+	Button& setVisible(bool v);
 	bool getVisible();
 
 	bool Pressed();
@@ -39,6 +44,7 @@ private:
 	void refresh();
 	bool released = false;
 	bool visible = true;
+	bool inManager = false;
 	Texture image, name;
 	pair<int, int> *mousePos;
 	int *mouseButton;

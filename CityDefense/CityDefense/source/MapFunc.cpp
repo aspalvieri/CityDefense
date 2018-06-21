@@ -32,6 +32,7 @@ void MapFunc::generateMap(Texture * tilesheet)
 {
 	clearMap();
 
+	//Fill map with water
 	for (int y = 0; y < MAP_Y; y++) {
 		for (int x = 0; x < MAP_X; x++) {
 			game->tiles[x][y] = new Tile(tilesheet, TILE_WATER, x * TILE_SIZE, y * TILE_SIZE, true, false);
@@ -40,6 +41,7 @@ void MapFunc::generateMap(Texture * tilesheet)
 
 	//Spawn bodies of grass
 	int totalbodies = game->randomInt(150, 175);
+	//Pre-define the tiles because operator overload won't allow defines
 	SDL_Rect shore = TILE_SHORE;
 	SDL_Rect water = TILE_WATER;
 	SDL_Rect grass = TILE_GRASS;

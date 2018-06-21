@@ -317,6 +317,13 @@ std::string Sprite::getName()
 	return spriteName;
 }
 
+Sprite & Sprite::freeImageSet()
+{
+	for (auto image : images) {
+		image.second.free();
+	}
+}
+
 bool checkCollision(SDL_Rect *A, SDL_Rect *B)
 {
 	//The sides of the rectangles

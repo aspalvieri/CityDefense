@@ -7,6 +7,10 @@ void Game::handleEvents()
 		//Update the user's mouse properties
 		if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) {
 			*mouseButton = SDL_GetMouseState(&mousePos->first, &mousePos->second);
+			if (mousePos->first >= SCREEN_WIDTH - UI_X)
+				hideObject = true;
+			else
+				hideObject = false;
 		}
 
 		//Move this autism
@@ -32,11 +36,22 @@ void Game::handleEvents()
 					currentObject->canPlace = false;
 				}
 			}
-			if (currentObject->canPlace && e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
+			if (!hideObject && currentObject->canPlace && e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
 				objects.push_back(new Object(*currentObject));
 				objects.back()->self.setFrame(currentObject->self.getFrame());
-				delete currentObject;
-				currentObject = NULL;
+				if (!multiPlace) {
+					placedOnce = false;
+					delete currentObject;
+					currentObject = NULL;
+					for (auto & butob : buttonObjects) {
+						get<0>(butob)->setVisible(true);
+					}
+					cancelButton.setVisible(false);
+				}
+				else if (multiPlace) {
+					placedOnce = true;
+					currentObject->self.setFrame(0);
+				}
 			}
 		}
 
@@ -48,52 +63,64 @@ void Game::handleEvents()
 			button->handleEvents(&e);
 		}
 
+		//Handle events for buttonObjects
+		for (auto & butob : buttonObjects) {
+			if (!currentObject && get<0>(butob)->Pressed()) {
+				delete currentObject;
+				currentObject = new Object(*get<2>(butob), false);
+				currentObject->self.setCamera(camera);
+				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
+				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
+				for (auto & butob2 : buttonObjects) {
+					get<0>(butob)->setVisible(false);
+				}
+				cancelButton.setVisible(true);
+			}
+		}
+
+		if (cancelButton.Pressed()) {
+			delete currentObject;
+			currentObject = NULL;
+			for (auto & butob : buttonObjects) {
+				get<0>(butob)->setVisible(true);
+			}
+			cancelButton.setVisible(false);
+		}
+
+		if (mapgenButton.Pressed()) {
+			mapfunc->generateMap(&tilesForest);
+		}
+
 		//User presses a key down
 		if (e.type == SDL_KEYDOWN) {
 			switch (e.key.keysym.sym) {
-			case SDLK_1:
-				delete currentObject;
-				currentObject = new Object(powerPlant, false);
-				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
-				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
-				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
-				break;
-			case SDLK_2:
-				delete currentObject;
-				currentObject = new Object(reactor, false);
-				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
-				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
-				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
-				break;
-			case SDLK_3:
-				delete currentObject;
-				currentObject = new Object(deleteObject, false);
-				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
-				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
-				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
-				break;
-			case SDLK_4:
-				delete currentObject;
-				currentObject = new Object(rockMiner, false);
-				currentObject->moveToMouse(mousePos->first + camera->x, mousePos->second + camera->y);
-				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
-				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
-				break;
-			case SDLK_g:
-				mapfunc->generateMap(&tilesForest);
-				break;
-			case SDLK_t:
-				for (int y = 0; y < MAP_Y; y++) {
-					for (int x = 0; x < MAP_X; x++) {
-						if (!tiles[x][y]->gridline)
-							tiles[x][y]->gridline = &gridline;
-						else
-							tiles[x][y]->gridline = NULL;
-					}
-				}
+			case SDLK_LSHIFT:
+			case SDLK_RSHIFT:
+				multiPlace = true;
 				break;
 			case SDLK_ESCAPE:
 				quit = true;
+				break;
+			default:
+				break;
+			}
+		}
+		if (e.type == SDL_KEYUP) {
+			switch (e.key.keysym.sym) {
+			case SDLK_LSHIFT:
+			case SDLK_RSHIFT:
+				multiPlace = false;
+				if (placedOnce) {
+					placedOnce = false;
+					delete currentObject;
+					currentObject = NULL;
+					for (auto & butob : buttonObjects) {
+						get<0>(butob)->setVisible(true);
+					}
+					cancelButton.setVisible(false);
+				}
+				break;
+			default:
 				break;
 			}
 		}
@@ -132,9 +159,8 @@ void Game::render()
 		sprite->draw();
 	}
 
-
 	//Make a class for this, or functions
-	if (currentObject) {
+	if (currentObject && !hideObject) {
 		currentObject->self.draw();
 		if (currentObject->canPlace) {
 			canPlace.render(currentObject->self.getBox().x - camera->x, currentObject->self.getBox().y - camera->y);
@@ -142,15 +168,26 @@ void Game::render()
 		if (!currentObject->canPlace) {
 			cantPlace.render(currentObject->self.getBox().x - camera->x, currentObject->self.getBox().y - camera->y);
 		}
-	}
 
-	//Render all gridlines (if turned on)
-	for (int y = maxCamY; y <= maxCamH; y++) {
-		for (int x = maxCamX; x <= maxCamW; x++) {
-			if (tiles[x][y]->gridline)
-				tiles[x][y]->gridline->render(tiles[x][y]->getBox().x - camera->x, tiles[x][y]->getBox().y - camera->y);
+		//Render gridlines
+		for (int y = maxCamY; y <= maxCamH; y++) {
+			for (int x = maxCamX; x <= maxCamW; x++) {
+				//gridline.render(tiles[x][y]->getBox().x - camera->x, tiles[x][y]->getBox().y - camera->y);
+			}
 		}
 	}
+
+	//Draw UI Panel
+	uipanel.render(SCREEN_WIDTH - UI_X, 0);
+	if (!currentObject) {
+		for (auto & butob : buttonObjects) {
+			uibg.render(get<1>(butob).getPosition().first, get<1>(butob).getPosition().second);
+			get<1>(butob).draw();
+			get<0>(butob)->render();
+		}
+	}
+	cancelButton.render();
+	mapgenButton.render();
 	
 	SDL_RenderPresent(gRenderer);
 }
@@ -297,6 +334,19 @@ void Game::destroy()
 	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
+
+	//Free sprites in the sprite manager
+	for (auto & sprite : Sprite::spriteManager) {
+		sprite->freeImageSet();
+	}
+
+	//Free textures in button manager
+	for (auto & button : Button::buttonManager) {
+		button->getImage().free();
+	}
+
+	//Free tileset
+	tilesForest.free();
 }
 
 void Game::buildFontManager()
@@ -310,13 +360,21 @@ void Game::buildFontManager()
 
 void Game::buildButtons()
 {
-	/*
-	a.setImage("bin/images/button.png")
-		.setCamera(camera)
-		.setPosition(300, 250)
-		.setSize(50, 50)
-		.setText("Off", { 255,192,0 }, fontManager[18]);
-		*/
+	uiButton.setImage("bin/images/uibutton.png")
+		.setSize(BUTTON_SIZE, BUTTON_SIZE);
+
+	cancelButton.setImage("bin/images/button.png")
+		.addToManager()
+		.setVisible(false)
+		.setSize(128, 32)
+		.setPosition(SCREEN_WIDTH - UI_X + 65, 50)
+		.setText("Cancel", { 255,255,255 }, fontManager[18]);
+
+	mapgenButton.setImage("bin/images/button.png")
+		.addToManager()
+		.setSize(160, 32)
+		.setPosition(SCREEN_WIDTH - UI_X + 48, 650)
+		.setText("Generate Map", { 255,255,255 }, fontManager[18]);
 }
 
 void Game::buildImages()
@@ -370,6 +428,11 @@ void Game::buildImages()
 	canPlace.loadImage("bin/images/greenpixel.png");
 	cantPlace.loadImage("bin/images/redpixel.png");
 	gridline.loadImage("bin/images/gridline.png");
+
+	uipanel.loadImage("bin/images/uipanel.png");
+	uipanel.setSize(UI_X, UI_Y);
+	uibg.loadImage("bin/images/brownpixel.png");
+	uibg.setSize(BUTTON_SIZE, BUTTON_SIZE);
 }
 
 void Game::buildObjects()
@@ -386,4 +449,32 @@ void Game::buildObjects()
 	rockMiner.self = minerSprite;
 	rockMiner.requiredType = "Rock";
 	rockMiner.defaultPlace = false;
+
+
+	buttonObjects.push_back({ new Button(uiButton), powerPlantSprite, new Object(powerPlant) });
+	get<2>(buttonObjects.back())->self.removeFromManager();
+	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 1), 16 + 32)
+		.setSize(BUTTON_SIZE, BUTTON_SIZE)
+		.setCamera(NULL)
+		.removeFromManager();
+	get<0>(buttonObjects.back())->setPosition(get<1>(buttonObjects.back()).getPosition().first, get<1>(buttonObjects.back()).getPosition().second)
+		.addToManager();
+
+	buttonObjects.push_back({ new Button(uiButton), reactorSprite, new Object(reactor) });
+	get<2>(buttonObjects.back())->self.removeFromManager();
+	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 3) + 4, 16 + 32)
+		.setSize(BUTTON_SIZE, BUTTON_SIZE)
+		.setCamera(NULL)
+		.removeFromManager();
+	get<0>(buttonObjects.back())->setPosition(get<1>(buttonObjects.back()).getPosition().first, get<1>(buttonObjects.back()).getPosition().second)
+		.addToManager();
+
+	buttonObjects.push_back({ new Button(uiButton), minerSprite, new Object(rockMiner) });
+	get<2>(buttonObjects.back())->self.removeFromManager();
+	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 5) + 8, 16 + 32)
+		.setSize(BUTTON_SIZE, BUTTON_SIZE)
+		.setCamera(NULL)
+		.removeFromManager();
+	get<0>(buttonObjects.back())->setPosition(get<1>(buttonObjects.back()).getPosition().first, get<1>(buttonObjects.back()).getPosition().second)
+		.addToManager();
 }

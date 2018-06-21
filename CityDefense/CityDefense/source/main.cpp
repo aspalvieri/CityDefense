@@ -8,7 +8,7 @@ SDL_Window* SDLR::gWindow = SDL_CreateWindow("City Defense", SDL_WINDOWPOS_UNDEF
 SDL_Renderer* SDLR::gRenderer = SDL_CreateRenderer(SDLR::gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 pair<int, int> SDLR::mousePosition = { 0, 0 };
 int SDLR::mouseButton = 0;
-SDL_Rect SDLR::camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+SDL_Rect SDLR::camera = { 0, 0, SCREEN_WIDTH - UI_X, SCREEN_HEIGHT };
 
 //Declare static managers
 vector<Button*> Button::buttonManager;

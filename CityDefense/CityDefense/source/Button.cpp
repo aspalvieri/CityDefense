@@ -8,14 +8,30 @@ Button::Button()
 	mouseButton = &SDLR::mouseButton;
 
 	clip = { 0, 0, 200, 100 };
-
-	Button::buttonManager.push_back(this);
 }
 
 Button::~Button()
 {
-	Button::buttonManager.erase(remove(Button::buttonManager.begin(), Button::buttonManager.end(), this), Button::buttonManager.end());
+	if (inManager) {
+		Button::buttonManager.erase(remove(Button::buttonManager.begin(), Button::buttonManager.end(), this), Button::buttonManager.end());
+	}
 }
+
+Button & Button::addToManager()
+{
+	Button::buttonManager.push_back(this);
+	inManager = true;
+	return *this;
+}
+
+Button & Button::removeFromManager()
+{
+	if (inManager) {
+		Button::buttonManager.erase(remove(Button::buttonManager.begin(), Button::buttonManager.end(), this), Button::buttonManager.end());
+	}
+	return *this;
+}
+
 
 Button& Button::setText(string t, SDL_Color col, TTF_Font* font)
 {
@@ -62,16 +78,22 @@ Button & Button::setImage(Texture img)
 	return *this;
 }
 
+Texture & Button::getImage()
+{
+	return image;
+}
+
 Button & Button::setCamera(SDL_Rect * cam)
 {
 	camera = cam;
 	return *this;
 }
 
-void Button::setVisible(bool v)
+Button & Button::setVisible(bool v)
 {
 	visible = v;
 	refresh();
+	return *this;
 }
 
 bool Button::getVisible()

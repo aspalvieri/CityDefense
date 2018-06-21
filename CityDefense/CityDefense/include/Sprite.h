@@ -93,6 +93,8 @@ public:
 
 	std::string getName();
 
+	Sprite & freeImageSet();
+
 private:
 	SDL_Rect * camera = NULL;
 	std::unordered_map<std::string, Texture> images;

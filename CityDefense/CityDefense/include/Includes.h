@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <time.h>
 #include <random>
+#include <tuple>
 
 using namespace std;
 

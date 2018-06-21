@@ -7,9 +7,13 @@
 #define MAP_X		100
 #define MAP_Y		100
 #define TILE_SIZE	32
+#define BUTTON_SIZE	48
 
 #define FIELD_X (MAP_X*TILE_SIZE)
 #define FIELD_Y (MAP_Y*TILE_SIZE)
+
+#define UI_X	256
+#define UI_Y	SCREEN_HEIGHT
 
 //Tiles
 #define TILE_GRASS	{0, 0, TILE_SIZE, TILE_SIZE}
