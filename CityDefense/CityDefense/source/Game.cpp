@@ -181,7 +181,7 @@ void Game::render()
 	uipanel.render(SCREEN_WIDTH - UI_X, 0);
 	if (!currentObject) {
 		for (auto & butob : buttonObjects) {
-			uibg.render(get<1>(butob).getPosition().first, get<1>(butob).getPosition().second);
+			uibg.render(get<1>(butob).getBox().x, get<1>(butob).getBox().y);
 			get<1>(butob).draw();
 			get<0>(butob)->render();
 		}

@@ -322,6 +322,7 @@ Sprite & Sprite::freeImageSet()
 	for (auto image : images) {
 		image.second.free();
 	}
+	return *this;
 }
 
 bool checkCollision(SDL_Rect *A, SDL_Rect *B)
