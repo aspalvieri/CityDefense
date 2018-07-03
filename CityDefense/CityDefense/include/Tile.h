@@ -13,6 +13,8 @@ public:
 	void draw();
 	bool getCollide();
 	SDL_Rect getBox();
+	SDL_Rect getClip();
+	Tile& setClip(SDL_Rect c);
 
 	bool operator==(const Tile& other);
 	bool operator==(const SDL_Rect& other);
@@ -21,7 +23,7 @@ public:
 private:
 	bool collide, walkable;
 	Texture * tilesheet;
-	SDL_Rect clip, *camera;
+	SDL_Rect clip = TILE_NONE, *camera;
 	int x, y;
 };
 

@@ -7,7 +7,7 @@ Button::Button()
 	mousePos = &SDLR::mousePosition;
 	mouseButton = &SDLR::mouseButton;
 
-	clip = { 0, 0, 200, 100 };
+	clip = { 0, 0, 0, 0 };
 }
 
 Button::~Button()
@@ -27,6 +27,7 @@ Button & Button::addToManager()
 Button & Button::removeFromManager()
 {
 	if (inManager) {
+		refresh();
 		Button::buttonManager.erase(remove(Button::buttonManager.begin(), Button::buttonManager.end(), this), Button::buttonManager.end());
 	}
 	return *this;
@@ -69,12 +70,27 @@ Button& Button::setPosition(double xpos, double ypos)
 Button & Button::setImage(string path)
 {
 	image.loadImage(path.c_str());
+	clip.w = image.width;
+	clip.h = (int)(image.height / 3.0);
 	return *this;
+}
+
+Button & Button::setObjectButton(bool o)
+{
+	objectButton = o;
+	return *this;
+}
+
+bool Button::getObjectButton()
+{
+	return objectButton;
 }
 
 Button & Button::setImage(Texture img)
 {
 	image = img;
+	clip.w = image.width;
+	clip.h = (int)(image.height / 3.0);
 	return *this;
 }
 
@@ -108,6 +124,11 @@ bool Button::Pressed()
 		return true;
 	}
 	return false;
+}
+
+void Button::forceRefresh()
+{
+	refresh();
 }
 
 void Button::updateText(string t)
@@ -163,11 +184,13 @@ void Button::render(int nx, int ny)
 			y = ny;
 		if (camera == NULL) {
 			image.render((int)x, (int)y, &clip);
-			name.render((int)(bx + x), (int)(by + y));
+			if (text != "")
+				name.render((int)(bx + x), (int)(by + y));
 		}
 		else if (camera != NULL) {
 			image.render((int)x - camera->x, (int)y - camera->y, &clip);
-			name.render((int)(bx + x) - camera->x, (int)(by + y) - camera->y);
+			if (text != "")
+				name.render((int)(bx + x) - camera->x, (int)(by + y) - camera->y);
 		}
 	}
 }

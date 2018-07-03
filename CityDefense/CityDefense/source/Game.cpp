@@ -6,11 +6,30 @@ void Game::handleEvents()
 	{
 		//Update the user's mouse properties
 		if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) {
+			if ((e.type == SDL_MOUSEBUTTONUP) && mousePos->first < UI_PLACE_X)
+				targetObject = NULL;
 			*mouseButton = SDL_GetMouseState(&mousePos->first, &mousePos->second);
-			if (mousePos->first >= SCREEN_WIDTH - UI_X)
+			SDLR::mPos.x = mousePos->first;
+			SDLR::mPos.y = mousePos->second;
+			if (mousePos->first >= UI_PLACE_X)
 				hideObject = true;
 			else
 				hideObject = false;
+		}
+
+		//Handle events for all buttons
+		for (auto & button : Button::buttonManager) {
+			if (button->getObjectButton()) {
+				if (!currentObject) {
+					if (mousePos->first >= UI_PLACE_X)
+						button->forceRefresh();
+					else
+						button->handleEvents(&e);
+				}
+			}
+			else {
+				button->handleEvents(&e);
+			}
 		}
 
 		//Move this autism
@@ -23,22 +42,33 @@ void Game::handleEvents()
 					if (tiles[x][y]->getCollide() && checkCollision(&currentObject->self.getBox(), &tiles[x][y]->getBox())) {
 						currentObject->canPlace = false;
 					}
+					if (currentObject->requiredTile != emptyTile && checkCollision(&currentObject->self.getBox(), &tiles[x][y]->getBox()) && currentObject->requiredTile != tiles[x][y]->getClip()) {
+						currentObject->canPlace = false;
+					}
 				}
 			}
 			for (auto & object : objects) {
-				if (object->getCollide() && checkCollision(camera, &object->self.getBox())
-					&& checkCollision(&currentObject->self.getBox(), &object->self.getBox())) 
+				if (object->getCollide() && checkCollision(camera, &object->self.getBox()) && checkCollision(&currentObject->self.getBox(), &object->self.getBox())) 
 				{
 					if (currentObject->requiredType != "" && object->type == currentObject->requiredType && isEqualBox(&object->self.getBox(), &currentObject->self.getBox())) {
 						currentObject->canPlace = true;
+						currentObject->ability.objectValue = object;
 						continue;
 					}
 					currentObject->canPlace = false;
+					if (currentObject->ability.objectValue)
+						currentObject->ability.objectValue = NULL;
 				}
 			}
-			if (!hideObject && currentObject->canPlace && e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
+			if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT && !hideObject && currentObject->canPlace && currentObject->hasCost(&population, &populationMax, &gold, &stone)) {
+				currentObject->removeCost(&population, &populationMax, &gold, &goldStorage, &stone, &stoneStorage);
+				if (currentObject->ability.objectValue)
+					currentObject->ability.objectValue->tileButton.removeFromManager();
 				objects.push_back(new Object(*currentObject));
 				objects.back()->self.setFrame(currentObject->self.getFrame());
+				objects.back()->tileButton.setVisible(true);
+				if (objects.back()->ability.alive)
+					objects.back()->ability.enabled = true;
 				if (!multiPlace) {
 					placedOnce = false;
 					delete currentObject;
@@ -51,6 +81,8 @@ void Game::handleEvents()
 				else if (multiPlace) {
 					placedOnce = true;
 					currentObject->self.setFrame(0);
+					if (currentObject->ability.objectValue)
+						currentObject->ability.objectValue = NULL;
 				}
 			}
 		}
@@ -58,14 +90,11 @@ void Game::handleEvents()
 		//Handle events for camera
 		cameraEvents(&e);
 
-		//Handle events for all buttons
-		for (auto & button : Button::buttonManager) {
-			button->handleEvents(&e);
-		}
-
 		//Handle events for buttonObjects
 		for (auto & butob : buttonObjects) {
 			if (!currentObject && get<0>(butob)->Pressed()) {
+				if (targetObject)
+					targetObject = NULL;
 				delete currentObject;
 				currentObject = new Object(*get<2>(butob), false);
 				currentObject->self.setCamera(camera);
@@ -85,6 +114,11 @@ void Game::handleEvents()
 				get<0>(butob)->setVisible(true);
 			}
 			cancelButton.setVisible(false);
+		}
+
+		if (deselectTarget.Pressed()) {
+			targetObject = NULL;
+			deselectTarget.setVisible(false);
 		}
 
 		if (mapgenButton.Pressed()) {
@@ -140,6 +174,108 @@ void Game::update()
 	if (currentObject)
 		currentObject->self.nextFrame();
 
+	for (auto & object : objects) {
+		if (object != currentObject) {
+			if (object->tileButton.Pressed()) {
+				targetObject = object;
+				if (targetObject == preTargetObject)
+					targetObject = NULL;
+			}
+			object->runAbility();
+			if (object->setToDelete) {
+				object->self.removeFromManager();
+				objects.erase(remove(objects.begin(), objects.end(), object), objects.end());
+			}
+			if (object->ability.alive && !object->ability.running) {
+				object->self.setEnabled(false);
+				object->ability.alive = false;
+				if (object->self.hasAnimation("Stopped"))
+					object->self.setAnimation("Stopped");
+			}
+		}
+	}
+
+	//Check storages
+	if (gold > goldStorage)
+		gold = goldStorage;
+	if (stone > stoneStorage)
+		stone = stoneStorage;
+
+	//Update stone display
+	if (preStone != stone || preStoneStorage != stoneStorage) {
+		preStone = stone;
+		stoneText.loadFont("Stone: " + to_string(stone) + "/" + to_string(stoneStorage), { 255,255,255 }, fontManager[18], UI_X);
+	}
+	//Update gold display
+	if (preGold != gold || preGoldStorage != goldStorage) {
+		preGold = gold;
+		goldText.loadFont("Gold: " + to_string(gold) + "/" + to_string(goldStorage), { 255,255,255 }, fontManager[18], UI_X);
+	}
+	//Update population display
+	if (prePop != population || prePopMax != populationMax) {
+		prePop = population;
+		prePopMax = populationMax;
+		populationText.loadFont("Population: " + to_string(population) + "/" + to_string(populationMax), { 255,255,255 }, fontManager[18], UI_X);
+	}
+
+	//Update target
+	if (preTargetObject != targetObject) {
+		preTargetObject = targetObject;
+		if (targetObject) {
+			stringstream().swap(tText);
+			tText << targetObject->name << "\n";
+			if (targetObject->abilityValue)
+				tText << "Remaining: " << targetObject->abilityValue << "\n";
+			if (targetObject->requiredType == "Rock") {
+				if (targetObject->ability.objectValue)
+					tText << "Mining: " << targetObject->ability.objectValue->subtype << "\nRemaining: " << targetObject->ability.objectValue->abilityValue << "\n";
+				else
+					tText << "Mining: Nothing\nRemaining: 0\n";
+			}
+			targetText.loadFont(tText.str(), { 255,255,255 }, fontManager[18], UI_X);
+		}
+	}
+
+	//Update building information
+	if (preCurrentObject != currentObject) {
+		preCurrentObject = currentObject;
+		if (currentObject) {
+			stringstream().swap(tText);
+			tText << currentObject->name << "\n";
+			tText << "Population: " << currentObject->population << "\n\nPrice:\nGold: " << currentObject->goldCost << "\nStone: " << currentObject->stoneCost << "\n";
+			tText << "\nInformation:\n";
+			if (currentObject->populationMax > 0)
+				tText << "Total Population +" << currentObject->populationMax << "\n";
+			if (currentObject->goldStorage > 0)
+				tText << "Gold Storage +" << currentObject->goldStorage << "\n";
+			if (currentObject->stoneStorage > 0)
+				tText << "Stone Storage +" << currentObject->stoneStorage << "\n";
+			if (currentObject->ability.alive)
+				tText << currentObject->ability.printAbility() << "\n";
+			currentObjectText.loadFont(tText.str(), { 255,255,255 }, fontManager[18], UI_X - 10);
+		}
+	}
+
+	//Update button objects
+	for (auto & butob : buttonObjects) {
+		if ((currentObject || targetObject) && get<0>(butob)->getVisible())
+			get<0>(butob)->setVisible(false);
+		else if ((!currentObject && !targetObject) && !get<0>(butob)->getVisible())
+			get<0>(butob)->setVisible(true);
+	}
+
+	//Update cancel button
+	if ((!currentObject || targetObject) && cancelButton.getVisible())
+		cancelButton.setVisible(false);
+	else if ((currentObject && !targetObject) && !cancelButton.getVisible())
+		cancelButton.setVisible(true);
+
+	//Update deselect button
+	if (targetObject && !deselectTarget.getVisible())
+		deselectTarget.setVisible(true);
+	else if (!targetObject && deselectTarget.getVisible())
+		deselectTarget.setVisible(false);
+
 	moveCamera();
 }
 
@@ -156,7 +292,15 @@ void Game::render()
 
 	//Render all sprites
 	for (auto & sprite : Sprite::spriteManager) {
-		sprite->draw();
+		if (checkCollision(&sprite->getBox(), camera))
+			sprite->draw();
+	}
+
+	//Draw buttons for tiles
+	for (auto & object : objects) {
+		object->tileButton.render();
+		if (targetObject == object)
+			object->highlight->render(object->self.getBox().x - camera->x, object->self.getBox().y - camera->y);
 	}
 
 	//Make a class for this, or functions
@@ -179,15 +323,23 @@ void Game::render()
 
 	//Draw UI Panel
 	uipanel.render(SCREEN_WIDTH - UI_X, 0);
-	if (!currentObject) {
-		for (auto & butob : buttonObjects) {
+	for (auto & butob : buttonObjects) {
+		if (!currentObject && !targetObject) {
 			uibg.render(get<1>(butob).getBox().x, get<1>(butob).getBox().y);
 			get<1>(butob).draw();
 			get<0>(butob)->render();
 		}
 	}
 	cancelButton.render();
+	deselectTarget.render();
 	mapgenButton.render();
+	populationText.render(UI_PLACE_X + 32, UI_PLACE_Y + 30);
+	goldText.render(UI_PLACE_X + 32, UI_PLACE_Y + 50);
+	stoneText.render(UI_PLACE_X + 32, UI_PLACE_Y + 70);
+	if (targetObject && !currentObject)
+		targetText.render(UI_PLACE_X + 32, UI_PLACE_Y + 140);
+	if (currentObject && !targetObject)
+		currentObjectText.render(UI_PLACE_X + 32, UI_PLACE_Y + 140);
 	
 	SDL_RenderPresent(gRenderer);
 }
@@ -197,6 +349,7 @@ void Game::initialize()
 	buildFontManager();
 	buildButtons();
 	buildImages();
+	buildTextDisplays();
 	buildObjects();
 
 	mapfunc = new MapFunc(this);
@@ -367,14 +520,26 @@ void Game::buildButtons()
 		.addToManager()
 		.setVisible(false)
 		.setSize(128, 32)
-		.setPosition(SCREEN_WIDTH - UI_X + 65, 50)
+		.setPosition(SCREEN_WIDTH - UI_X + 65, 100)
 		.setText("Cancel", { 255,255,255 }, fontManager[18]);
+
+	deselectTarget.setImage("bin/images/button.png")
+		.addToManager()
+		.setVisible(false)
+		.setSize(128, 32)
+		.setPosition(SCREEN_WIDTH - UI_X + 65, 100)
+		.setText("Deselect", { 255,255,255 }, fontManager[18]);
 
 	mapgenButton.setImage("bin/images/button.png")
 		.addToManager()
 		.setSize(160, 32)
 		.setPosition(SCREEN_WIDTH - UI_X + 48, 650)
 		.setText("Generate Map", { 255,255,255 }, fontManager[18]);
+
+	tileButton.setImage("bin/images/tilebutton.png")
+		.setVisible(false)
+		.setObjectButton(true)
+		.setSize(TILE_SIZE, TILE_SIZE);
 }
 
 void Game::buildImages()
@@ -404,6 +569,14 @@ void Game::buildImages()
 		.pushFrameRow("Idle", 0, 0, TILE_SIZE, 0, 4)
 		.setAnimation("Idle");
 
+	goldRockSprite.loadSpriteImage("bin/images/goldrock.png")
+		.setCamera(camera)
+		.setEnabled(false)
+		.setFrameSize(TILE_SIZE, TILE_SIZE)
+		.setSize(TILE_SIZE, TILE_SIZE)
+		.pushFrameRow("Idle", 0, 0, TILE_SIZE, 0, 4)
+		.setAnimation("Idle");
+
 	minerSprite.loadSpriteImage("bin/images/weakminer.png")
 		.setCamera(camera)
 		.setFrameSize(32, 32)
@@ -416,12 +589,13 @@ void Game::buildImages()
 		.pushFrameRow("Idle", 0, 128, 32, 0, 6)
 		.setAnimation("Idle");
 
-	deleteSprite.loadSpriteImage("bin/images/delete.png")
+	farmSprite.loadSpriteImage("bin/images/smallhouse.png")
 		.setCamera(camera)
-		.setFrameSize(96, 64)
-		.setSize(TILE_SIZE * 3, TILE_SIZE * 1)
-		.setDelay(3)
-		.pushFrameRow("Idle", 0, 0, 96, 0, 2)
+		.setFrameSize(32, 32)
+		.setSize(TILE_SIZE, TILE_SIZE)
+		.setDelay(12)
+		.pushFrameRow("Idle", 0, 0, 32, 0, 8)
+		.pushFrameRow("Stopped", 0, 32, 32, 0, 1)
 		.setAnimation("Idle");
 
 	tilesForest.loadImage("bin/images/tilesheetforest.png");
@@ -430,30 +604,56 @@ void Game::buildImages()
 	gridline.loadImage("bin/images/gridline.png");
 
 	uipanel.loadImage("bin/images/uipanel.png");
-	uipanel.setSize(UI_X, UI_Y);
 	uibg.loadImage("bin/images/brownpixel.png");
 	uibg.setSize(BUTTON_SIZE, BUTTON_SIZE);
+	tileHighlight.loadImage("bin/images/highlight.png");
+}
+
+void Game::buildTextDisplays()
+{
+	stoneText.loadFont("Stone: "+to_string(stone) + "/" + to_string(stoneStorage), { 255,255,255 }, fontManager[18], UI_X);
+	goldText.loadFont("Gold: "+to_string(gold) + "/" + to_string(goldStorage), { 255,255,255 }, fontManager[18], UI_X);
+	populationText.loadFont("Population: " + to_string(population) + "/" + to_string(populationMax), { 255,255,255 }, fontManager[18], UI_X);
 }
 
 void Game::buildObjects()
 {
 	powerPlant.self = powerPlantSprite;
+	powerPlant.setCost("Power Plant", 5, 20, 10)
+		.setButton(tileButton, &tileHighlight)
+		.setStorage(0, 25, 0);
 
 	reactor.self = reactorSprite;
-
-	deleteObject.self = deleteSprite;
+	reactor.setCost("Reactor", 5, 10, 0)
+		.setButton(tileButton, &tileHighlight)
+		.setStorage(0, 0, 25);
 
 	rocks.self = rockSprite;
 	rocks.type = "Rock";
+	rocks.subtype = "Stone";
+	rocks.name = "Stone Rocks";
+	rocks.setButton(tileButton, &tileHighlight);
+
+	goldrocks.self = goldRockSprite;
+	goldrocks.type = "Rock";
+	goldrocks.subtype = "Gold";
+	goldrocks.name = "Gold Rocks";
+	goldrocks.setButton(tileButton, &tileHighlight);
 
 	rockMiner.self = minerSprite;
 	rockMiner.requiredType = "Rock";
 	rockMiner.defaultPlace = false;
+	rockMiner.setCost("Weak Rock Miner", 1, 25, 0)
+		.setButton(tileButton, &tileHighlight);
 
+	smallFarm.self = farmSprite;
+	smallFarm.setCost("Small Farm", 0, 40, 0)
+		.setButton(tileButton, &tileHighlight)
+		.setStorage(3, 0, 0);
 
 	buttonObjects.push_back({ new Button(uiButton), powerPlantSprite, new Object(powerPlant) });
 	get<2>(buttonObjects.back())->self.removeFromManager();
-	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 1), 16 + 32)
+	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 1), 100)
 		.setSize(BUTTON_SIZE, BUTTON_SIZE)
 		.setCamera(NULL)
 		.removeFromManager();
@@ -462,7 +662,7 @@ void Game::buildObjects()
 
 	buttonObjects.push_back({ new Button(uiButton), reactorSprite, new Object(reactor) });
 	get<2>(buttonObjects.back())->self.removeFromManager();
-	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 3) + 4, 16 + 32)
+	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 3) + 4, 100)
 		.setSize(BUTTON_SIZE, BUTTON_SIZE)
 		.setCamera(NULL)
 		.removeFromManager();
@@ -471,7 +671,19 @@ void Game::buildObjects()
 
 	buttonObjects.push_back({ new Button(uiButton), minerSprite, new Object(rockMiner) });
 	get<2>(buttonObjects.back())->self.removeFromManager();
-	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 5) + 8, 16 + 32)
+	get<2>(buttonObjects.back())->ability = Ability("RockMiner", &gold, &stone, 1, 90);
+	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 5) + 8, 100)
+		.setSize(BUTTON_SIZE, BUTTON_SIZE)
+		.setCamera(NULL)
+		.removeFromManager();
+	get<0>(buttonObjects.back())->setPosition(get<1>(buttonObjects.back()).getPosition().first, get<1>(buttonObjects.back()).getPosition().second)
+		.addToManager();
+
+	buttonObjects.push_back({ new Button(uiButton), farmSprite, new Object(smallFarm) });
+	get<2>(buttonObjects.back())->self.removeFromManager();
+	//get<2>(buttonObjects.back())->ability = Ability("GoldIncome", &gold, &stone, 1, 120, 50);
+	get<2>(buttonObjects.back())->requiredTile.setClip(TILE_DIRT);
+	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 1), 160)
 		.setSize(BUTTON_SIZE, BUTTON_SIZE)
 		.setCamera(NULL)
 		.removeFromManager();

@@ -34,6 +34,17 @@ SDL_Rect Tile::getBox()
 	return { x, y, clip.w, clip.h };
 }
 
+SDL_Rect Tile::getClip()
+{
+	return clip;
+}
+
+Tile & Tile::setClip(SDL_Rect c)
+{
+	clip = c;
+	return *this;
+}
+
 bool Tile::operator==(const Tile & other)
 {
 	if (clip.x == other.clip.x && clip.y == other.clip.y && clip.w == other.clip.w && clip.h == other.clip.h)

@@ -93,6 +93,8 @@ public:
 
 	std::string getName();
 
+	bool hasAnimation(std::string anim);
+
 	Sprite & freeImageSet();
 
 private:

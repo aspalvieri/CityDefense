@@ -317,6 +317,14 @@ std::string Sprite::getName()
 	return spriteName;
 }
 
+bool Sprite::hasAnimation(std::string anim)
+{
+	std::unordered_map<std::string, vector<std::pair<int,int>>>::const_iterator got = animations.find(anim);
+	if (got == animations.end())
+		return false;
+	return true;
+}
+
 Sprite & Sprite::freeImageSet()
 {
 	for (auto image : images) {

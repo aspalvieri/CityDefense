@@ -9,6 +9,8 @@
 #include "Object.h"
 
 class MapFunc;
+class Object;
+class Ability;
 
 class Game
 {
@@ -22,6 +24,7 @@ public:
 	void buildFontManager();
 	void buildButtons();
 	void buildImages();
+	void buildTextDisplays();
 	void buildObjects();
 	void destroy();
 
@@ -43,19 +46,27 @@ public:
 //*************
 //	Variables
 //*************
-	Sprite powerPlantSprite, reactorSprite, rockSprite, minerSprite;
-	Object powerPlant, reactor, rocks, rockMiner;
+	Sprite powerPlantSprite, reactorSprite, rockSprite, goldRockSprite, minerSprite, farmSprite;
+	Object powerPlant, reactor, rocks, goldrocks, rockMiner, smallFarm;
 
 	vector<Object*> objects;
 	vector<tuple<Button*, Sprite, Object*>> buttonObjects;
-	Button cancelButton, mapgenButton;
-	Object *currentObject = NULL;
+	Button cancelButton, mapgenButton, tileButton, deselectTarget;
+	Object *currentObject = NULL, *targetObject = NULL, *preTargetObject = NULL, *preCurrentObject = NULL;
 	bool hideObject = false, multiPlace = false, placedOnce = false;
+	SDL_Rect emptyTile = TILE_NONE;
 
 	Button uiButton;
 
-	Sprite deleteSprite;
-	Object deleteObject;
+	//Player variables
+	int gold = BASE_GOLD, stone = BASE_STONE, population = BASE_POPULATION;
+	int goldStorage = BASE_GOLD_STORAGE, stoneStorage = BASE_STONE_STORAGE, populationMax = BASE_POPULATION_MAX;
+	//Variable displays
+	Texture goldText, stoneText, populationText, tileHighlight, targetText, currentObjectText;
+	stringstream tText;
+	//Update variables
+	int preGold = gold, preStone = stone, preGoldStorage = goldStorage, preStoneStorage = stoneStorage;
+	int prePop = population, prePopMax = populationMax;
 
 	//Tilesheet
 	Texture tilesForest, canPlace, cantPlace, gridline, uipanel, uibg;

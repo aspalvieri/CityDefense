@@ -23,6 +23,9 @@ public:
 
 	Button& setImage(string path);
 
+	Button& setObjectButton(bool o);
+	bool getObjectButton();
+
 	Button& setImage(Texture img);
 	Texture& getImage();
 
@@ -32,6 +35,7 @@ public:
 	bool getVisible();
 
 	bool Pressed();
+	void forceRefresh();
 
 	void updateText(string t);
 
@@ -45,6 +49,7 @@ private:
 	bool released = false;
 	bool visible = true;
 	bool inManager = false;
+	bool objectButton = false;
 	Texture image, name;
 	pair<int, int> *mousePos;
 	int *mouseButton;
