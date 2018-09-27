@@ -132,6 +132,22 @@ void Game::handleEvents()
 			case SDLK_RSHIFT:
 				multiPlace = true;
 				break;
+			case SDLK_r:
+			{
+				int grem = 0, srem = 0;
+				for (auto & object : objects) {
+					if (object->type == "Rock") {
+						if (object->subtype == "Gold") {
+							grem += object->abilityValue;
+						}
+						if (object->subtype == "Stone") {
+							srem += object->abilityValue;
+						}
+					}
+				}
+				cout << "Gold remaining in map: " << grem << ", Stone remaining in map:" << srem << "\n";
+				break;
+			}
 			case SDLK_ESCAPE:
 				quit = true;
 				break;

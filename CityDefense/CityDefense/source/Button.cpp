@@ -150,7 +150,7 @@ void Button::handleEvents(SDL_Event * e)
 	{
 		int cx = (camera == NULL) ? 0 : camera->x;
 		int cy = (camera == NULL) ? 0 : camera->y;
-		if (mousePos->first >= x - cx && mousePos->second >= y - cy && mousePos->first <= x + width - cx && mousePos->second <= y + height - cy)
+		if (mousePos->first > x - cx && mousePos->second > y - cy && mousePos->first < x + width - cx && mousePos->second < y + height - cy)
 		{
 			if (!pressed)
 				clip.y = 100;

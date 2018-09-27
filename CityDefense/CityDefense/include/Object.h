@@ -45,11 +45,25 @@ public:
 
 	void move(double x, double y);
 	void moveToMouse(double x, double y, bool snapToGrid = true);
+	
+	//n{Name}, pop{Population}, gc{Gold Cost}, sc{Stone Cost}
 	Object & setCost(string n = "", int pop = 0, int gc = 0, int sc = 0);
+
+	//Set button for UI
 	Object & setButton(Button b, Texture *h);
+
+	//ps{Population Storage}, gs{Gold Storage}, ss{Stone Storage}
 	Object & setStorage(int ps = 0, int gs = 0, int ss = 0);
+
+	//Subtracts object's costs from player's values
 	Object & removeCost(int *pop, int *popmax, int *gold, int *goldst, int *stone, int *stonest);
+
+	/*Does the reverse of removeCost (Adds the object's costs to the player's values),
+	and sets the object to be deleted on the next update*/
 	Object & deleteObject(int *pop, int *popmax, int *gold, int *goldst, int *stone, int *stonest);
+
+	/*Returns true if the player meets the object's costs, 
+	p{Population}, pm{Population Max}, g{Gold}, s{Stone}*/
 	bool hasCost(int *p, int *pm, int *g, int *s);
 	bool getCollide();
 	void runAbility();
