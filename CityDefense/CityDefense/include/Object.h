@@ -30,6 +30,9 @@ public:
 
 	bool running = true, enabled = false, alive = false;
 
+	//If set to true, forces the display to update the selected text
+	bool abilityUpdated = false;
+
 	string type = "";
 	vector<int*> intValues;
 	Object* objectValue = NULL;
@@ -73,11 +76,17 @@ public:
 	Ability ability;
 	Button tileButton;
 	Sprite self;
-	string type = "", subtype = "", requiredType = "", name = "";
+	string type = "", subtype = "", name = "";
+	//The type of tile needed for the object to be placeable. If one is set, 'defaultPlace' has to be false
+	string requiredType = "";
 	Tile requiredTile;
 	Texture *highlight = NULL;
-	bool canPlace = true, collide, defaultPlace = true, setToDelete = false;
-	int abilityValue = 0, goldStorage = 0, stoneStorage = 0, population = 0, populationMax;
+	bool canPlace = true, collide, setToDelete = false;
+	//If the object can be placed by default, setting false will require a 'requiredType'
+	bool defaultPlace = true;
+	//The int value in which the ability uses
+	int abilityValue = 0;
+	int goldStorage = 0, stoneStorage = 0, population = 0, populationMax;
 };
 
 #endif//OBJECT_H

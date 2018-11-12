@@ -235,10 +235,10 @@ void Game::update()
 	}
 
 	//Update target
-	if (preTargetObject != targetObject) {
+	if (preTargetObject != targetObject || (preTargetObject && preTargetObject->ability.alive && preTargetObject->ability.abilityUpdated)) {
 		preTargetObject = targetObject;
 		if (targetObject) {
-			stringstream().swap(tText);
+			stringstream().swap(tText); //Clears and empties the given stringstream
 			tText << targetObject->name << "\n";
 			if (targetObject->abilityValue)
 				tText << "Remaining: " << targetObject->abilityValue << "\n";
@@ -667,42 +667,50 @@ void Game::buildObjects()
 		.setButton(tileButton, &tileHighlight)
 		.setStorage(3, 0, 0);
 
-	buttonObjects.push_back({ new Button(uiButton), powerPlantSprite, new Object(powerPlant) });
-	get<2>(buttonObjects.back())->self.removeFromManager();
-	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 1), 100)
-		.setSize(BUTTON_SIZE, BUTTON_SIZE)
-		.setCamera(NULL)
-		.removeFromManager();
-	get<0>(buttonObjects.back())->setPosition(get<1>(buttonObjects.back()).getPosition().first, get<1>(buttonObjects.back()).getPosition().second)
-		.addToManager();
+	addButtonObject(&powerPlantSprite, &powerPlant);
+	addButtonObject(&reactorSprite, &reactor);
+	addButtonObject(&minerSprite, &rockMiner, Ability("RockMiner", &gold, &stone, 1, FTS(1.5)) );
+	addButtonObject(&farmSprite, &smallFarm, TILE_DIRT);
+}
 
-	buttonObjects.push_back({ new Button(uiButton), reactorSprite, new Object(reactor) });
-	get<2>(buttonObjects.back())->self.removeFromManager();
-	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 3) + 4, 100)
-		.setSize(BUTTON_SIZE, BUTTON_SIZE)
-		.setCamera(NULL)
-		.removeFromManager();
-	get<0>(buttonObjects.back())->setPosition(get<1>(buttonObjects.back()).getPosition().first, get<1>(buttonObjects.back()).getPosition().second)
-		.addToManager();
+//Frames to Seconds
+double Game::FTS(double time)
+{
+	return time * SCREEN_FPS;
+}
 
-	buttonObjects.push_back({ new Button(uiButton), minerSprite, new Object(rockMiner) });
+void Game::addButtonObject(Sprite *spr, Object *obj)
+{
+	buttonObjects.push_back({ new Button(uiButton), *spr, new Object(*obj) });
 	get<2>(buttonObjects.back())->self.removeFromManager();
-	get<2>(buttonObjects.back())->ability = Ability("RockMiner", &gold, &stone, 1, 90);
-	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 5) + 8, 100)
+	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + bobx, boby)
 		.setSize(BUTTON_SIZE, BUTTON_SIZE)
 		.setCamera(NULL)
 		.removeFromManager();
 	get<0>(buttonObjects.back())->setPosition(get<1>(buttonObjects.back()).getPosition().first, get<1>(buttonObjects.back()).getPosition().second)
 		.addToManager();
+	bobx += 68;
+	if (bobx > 168)
+	{
+		boby += 60;
+		bobx = 32;
+	}
+}
 
-	buttonObjects.push_back({ new Button(uiButton), farmSprite, new Object(smallFarm) });
-	get<2>(buttonObjects.back())->self.removeFromManager();
-	//get<2>(buttonObjects.back())->ability = Ability("GoldIncome", &gold, &stone, 1, 120, 50);
-	get<2>(buttonObjects.back())->requiredTile.setClip(TILE_DIRT);
-	get<1>(buttonObjects.back()).setPosition(SCREEN_WIDTH - UI_X + (TILE_SIZE * 1), 160)
-		.setSize(BUTTON_SIZE, BUTTON_SIZE)
-		.setCamera(NULL)
-		.removeFromManager();
-	get<0>(buttonObjects.back())->setPosition(get<1>(buttonObjects.back()).getPosition().first, get<1>(buttonObjects.back()).getPosition().second)
-		.addToManager();
+void Game::addButtonObject(Sprite *spr, Object *obj, SDL_Rect req)
+{
+	addButtonObject(spr, obj);
+	get<2>(buttonObjects.back())->requiredTile.setClip(req);
+}
+
+void Game::addButtonObject(Sprite *spr, Object *obj, Ability abi)
+{
+	addButtonObject(spr, obj);
+	get<2>(buttonObjects.back())->ability = abi;
+}
+
+void Game::addButtonObject(Sprite *spr, Object *obj, SDL_Rect req, Ability abi)
+{
+	addButtonObject(spr, obj, req);
+	get<2>(buttonObjects.back())->ability = abi;
 }

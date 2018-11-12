@@ -28,6 +28,15 @@ public:
 	void buildObjects();
 	void destroy();
 
+	//Object Manipulation
+	void addButtonObject(Sprite *spr, Object *obj);
+	void addButtonObject(Sprite *spr, Object *obj, SDL_Rect req);
+	void addButtonObject(Sprite *spr, Object *obj, Ability abi);
+	void addButtonObject(Sprite *spr, Object *obj, SDL_Rect req, Ability abi);
+
+	//Frames to Seconds
+	double FTS(double time);
+
 	//Main game
 	void handleEvents();
 	void update();
@@ -78,6 +87,7 @@ public:
 	SDL_Rect *camera;
 	int camSpeed = 12;
 	double xspeed = 0, yspeed = 0, posx, posy;
+	int bobx = 32, boby = 100;
 
 	//Random device
 	random_device rd;

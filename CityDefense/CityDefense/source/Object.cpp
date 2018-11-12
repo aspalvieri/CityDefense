@@ -125,29 +125,35 @@ void Object::runAbility()
 
 void Ability::run()
 {
-	if (enabled && timer++ >= speed) {
-		timer = 0;
-		if (type == "RockMiner" && objectValue) {
-			objectValue->abilityValue -= income;
-			if (objectValue->abilityValue < 0)
-				income += objectValue->abilityValue;
-			if (objectValue->subtype == "Gold")
-				*intValues[0] += income;
-			if (objectValue->subtype == "Stone")
-				*intValues[1] += income;
-			if (objectValue->abilityValue <= 0) {
-				objectValue->setToDelete = true;
-				objectValue = NULL;
-				running = false;
+	if (enabled) 
+	{
+		abilityUpdated = false; 
+		if (timer++ >= speed) 
+		{
+			timer = 0;
+			abilityUpdated = true;
+			if (type == "RockMiner" && objectValue) {
+				objectValue->abilityValue -= income;
+				if (objectValue->abilityValue < 0)
+					income += objectValue->abilityValue;
+				if (objectValue->subtype == "Gold")
+					*intValues[0] += income;
+				if (objectValue->subtype == "Stone")
+					*intValues[1] += income;
+				if (objectValue->abilityValue <= 0) {
+					objectValue->setToDelete = true;
+					objectValue = NULL;
+					running = false;
+				}
 			}
-		}
-		if (type == "GoldIncome") {
-			remaining -= income;
-			if (remaining < 0)
-				income += remaining;
-			*intValues[0] += income;
-			if (remaining <= 0) {
-				running = false;
+			if (type == "GoldIncome") {
+				remaining -= income;
+				if (remaining < 0)
+					income += remaining;
+				*intValues[0] += income;
+				if (remaining <= 0) {
+					running = false;
+				}
 			}
 		}
 	}
