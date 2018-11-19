@@ -127,7 +127,7 @@ void Ability::run()
 {
 	if (enabled) 
 	{
-		abilityUpdated = false; 
+		abilityUpdated = false;
 		if (timer++ >= speed) 
 		{
 			timer = 0;
@@ -163,7 +163,7 @@ string Ability::printAbility()
 {
 	stringstream abt;
 	if (type == "RockMiner") {
-		abt << "Mines " << income << " from rocks, every " << fixed << setprecision(1) << (speed / 60.0) << " seconds.";
+		abt << "Mines " << income << " ore from rocks, every " << fixed << setprecision(1) << (speed / 60.0) << " seconds.";
 	}
 	return abt.str();
 }

@@ -220,22 +220,31 @@ void Game::update()
 	//Update stone display
 	if (preStone != stone || preStoneStorage != stoneStorage) {
 		preStone = stone;
-		stoneText.loadFont("Stone: " + to_string(stone) + "/" + to_string(stoneStorage), { 255,255,255 }, fontManager[18], UI_X);
+		if (stone >= stoneStorage)
+			stoneText.loadFont("Stone: " + to_string(stone) + "/" + to_string(stoneStorage), { 255,0,0 }, fontManager[18], UI_X);
+		else
+			stoneText.loadFont("Stone: " + to_string(stone) + "/" + to_string(stoneStorage), { 255,255,255 }, fontManager[18], UI_X);
 	}
 	//Update gold display
 	if (preGold != gold || preGoldStorage != goldStorage) {
 		preGold = gold;
-		goldText.loadFont("Gold: " + to_string(gold) + "/" + to_string(goldStorage), { 255,255,255 }, fontManager[18], UI_X);
+		if (gold >= goldStorage)
+			goldText.loadFont("Gold: " + to_string(gold) + "/" + to_string(goldStorage), { 255,0,0 }, fontManager[18], UI_X);
+		else
+			goldText.loadFont("Gold: " + to_string(gold) + "/" + to_string(goldStorage), { 255,255,255 }, fontManager[18], UI_X);
 	}
 	//Update population display
 	if (prePop != population || prePopMax != populationMax) {
 		prePop = population;
 		prePopMax = populationMax;
-		populationText.loadFont("Population: " + to_string(population) + "/" + to_string(populationMax), { 255,255,255 }, fontManager[18], UI_X);
+		if (population >= populationMax)
+			populationText.loadFont("Population: " + to_string(population) + "/" + to_string(populationMax), { 255,0,0 }, fontManager[18], UI_X);
+		else
+			populationText.loadFont("Population: " + to_string(population) + "/" + to_string(populationMax), { 255,255,255 }, fontManager[18], UI_X);
 	}
 
 	//Update target
-	if (preTargetObject != targetObject || (preTargetObject && preTargetObject->ability.alive && preTargetObject->ability.abilityUpdated)) {
+	if (preTargetObject != targetObject || (preTargetObject && preTargetObject->ability.abilityUpdated)) {
 		preTargetObject = targetObject;
 		if (targetObject) {
 			stringstream().swap(tText); //Clears and empties the given stringstream
@@ -268,7 +277,7 @@ void Game::update()
 				tText << "Stone Storage +" << currentObject->stoneStorage << "\n";
 			if (currentObject->ability.alive)
 				tText << currentObject->ability.printAbility() << "\n";
-			currentObjectText.loadFont(tText.str(), { 255,255,255 }, fontManager[18], UI_X - 10);
+			currentObjectText.loadFont(tText.str(), { 255,255,255 }, fontManager[18], UI_X - 56);
 		}
 	}
 
