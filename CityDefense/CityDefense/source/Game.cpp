@@ -99,6 +99,7 @@ void Game::handleEvents()
 				currentObject = new Object(*get<2>(butob), false);
 				currentObject->self.setCamera(camera);
 				canPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
+				canPlacePoor.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
 				cantPlace.setScale(currentObject->self.getSize().first, currentObject->self.getSize().second);
 				for (auto & butob2 : buttonObjects) {
 					get<0>(butob)->setVisible(false);
@@ -224,6 +225,8 @@ void Game::update()
 			stoneText.loadFont("Stone: " + to_string(stone) + "/" + to_string(stoneStorage), { 255,0,0 }, fontManager[18], UI_X);
 		else
 			stoneText.loadFont("Stone: " + to_string(stone) + "/" + to_string(stoneStorage), { 255,255,255 }, fontManager[18], UI_X);
+		if (currentObject)
+			preCurrentObject = NULL;
 	}
 	//Update gold display
 	if (preGold != gold || preGoldStorage != goldStorage) {
@@ -232,6 +235,8 @@ void Game::update()
 			goldText.loadFont("Gold: " + to_string(gold) + "/" + to_string(goldStorage), { 255,0,0 }, fontManager[18], UI_X);
 		else
 			goldText.loadFont("Gold: " + to_string(gold) + "/" + to_string(goldStorage), { 255,255,255 }, fontManager[18], UI_X);
+		if (currentObject)
+			preCurrentObject = NULL;
 	}
 	//Update population display
 	if (prePop != population || prePopMax != populationMax) {
@@ -241,13 +246,15 @@ void Game::update()
 			populationText.loadFont("Population: " + to_string(population) + "/" + to_string(populationMax), { 255,0,0 }, fontManager[18], UI_X);
 		else
 			populationText.loadFont("Population: " + to_string(population) + "/" + to_string(populationMax), { 255,255,255 }, fontManager[18], UI_X);
+		if (currentObject)
+			preCurrentObject = NULL;
 	}
 
 	//Update target
 	if (preTargetObject != targetObject || (preTargetObject && preTargetObject->ability.abilityUpdated)) {
 		preTargetObject = targetObject;
 		if (targetObject) {
-			stringstream().swap(tText); //Clears and empties the given stringstream
+			tText = stringstream(); //Clears and empties the given stringstream
 			tText << targetObject->name << "\n";
 			if (targetObject->abilityValue)
 				tText << "Remaining: " << targetObject->abilityValue << "\n";
@@ -265,10 +272,20 @@ void Game::update()
 	if (preCurrentObject != currentObject) {
 		preCurrentObject = currentObject;
 		if (currentObject) {
-			stringstream().swap(tText);
-			tText << currentObject->name << "\n";
-			tText << "Population: " << currentObject->population << "\n\nPrice:\nGold: " << currentObject->goldCost << "\nStone: " << currentObject->stoneCost << "\n";
-			tText << "\nInformation:\n";
+			tText = stringstream();
+			tText << currentObject->name << "\n\n\nPrice";
+			currentObjectTextName.loadFont(tText.str(), { 255,255,255 }, fontManager[18], UI_X - 56);
+			tText = stringstream();
+			tText << "Population: " << currentObject->population;
+			currentObjectTextPopulationCost.loadFont(tText.str(), (population + currentObject->population <= populationMax) ? COLOR_WHITE : COLOR_RED, fontManager[18], UI_X - 56);
+			tText = stringstream();
+			tText << "Gold: " << currentObject->goldCost;
+			currentObjectTextGoldCost.loadFont(tText.str(), (gold - currentObject->goldCost >= 0) ? COLOR_WHITE : COLOR_RED, fontManager[18], UI_X - 56);
+			tText = stringstream();
+			tText << "Stone: " << currentObject->stoneCost;
+			currentObjectTextStoneCost.loadFont(tText.str(), (stone - currentObject->stoneCost >= 0) ? COLOR_WHITE : COLOR_RED, fontManager[18], UI_X - 56);
+			tText = stringstream();
+			tText << "Information:\n";
 			if (currentObject->populationMax > 0)
 				tText << "Total Population +" << currentObject->populationMax << "\n";
 			if (currentObject->goldStorage > 0)
@@ -277,7 +294,7 @@ void Game::update()
 				tText << "Stone Storage +" << currentObject->stoneStorage << "\n";
 			if (currentObject->ability.alive)
 				tText << currentObject->ability.printAbility() << "\n";
-			currentObjectText.loadFont(tText.str(), { 255,255,255 }, fontManager[18], UI_X - 56);
+			currentObjectTextInfo.loadFont(tText.str(), { 255,255,255 }, fontManager[18], UI_X - 56);
 		}
 	}
 
@@ -332,7 +349,10 @@ void Game::render()
 	if (currentObject && !hideObject) {
 		currentObject->self.draw();
 		if (currentObject->canPlace) {
-			canPlace.render(currentObject->self.getBox().x - camera->x, currentObject->self.getBox().y - camera->y);
+			if (currentObject->hasCost(&population, &populationMax, &gold, &stone))
+				canPlace.render(currentObject->self.getBox().x - camera->x, currentObject->self.getBox().y - camera->y);
+			else
+				canPlacePoor.render(currentObject->self.getBox().x - camera->x, currentObject->self.getBox().y - camera->y);
 		}
 		if (!currentObject->canPlace) {
 			cantPlace.render(currentObject->self.getBox().x - camera->x, currentObject->self.getBox().y - camera->y);
@@ -353,6 +373,9 @@ void Game::render()
 			uibg.render(get<1>(butob).getBox().x, get<1>(butob).getBox().y);
 			get<1>(butob).draw();
 			get<0>(butob)->render();
+			if (!get<2>(butob)->hasCost(&population, &populationMax, &gold, &stone)) {
+				buttonHighlight.render(get<1>(butob).getBox().x, get<1>(butob).getBox().y);
+			}
 		}
 	}
 	cancelButton.render();
@@ -364,7 +387,13 @@ void Game::render()
 	if (targetObject && !currentObject)
 		targetText.render(UI_PLACE_X + 32, UI_PLACE_Y + 140);
 	if (currentObject && !targetObject)
-		currentObjectText.render(UI_PLACE_X + 32, UI_PLACE_Y + 140);
+	{
+		currentObjectTextName.render(UI_PLACE_X + 32, UI_PLACE_Y + 140);
+		currentObjectTextPopulationCost.render(UI_PLACE_X + 32, UI_PLACE_Y + 160);
+		currentObjectTextGoldCost.render(UI_PLACE_X + 32, UI_PLACE_Y + 216);
+		currentObjectTextStoneCost.render(UI_PLACE_X + 32, UI_PLACE_Y + 234);
+		currentObjectTextInfo.render(UI_PLACE_X + 32, UI_PLACE_Y + 270);
+	}
 	
 	SDL_RenderPresent(gRenderer);
 }
@@ -589,17 +618,17 @@ void Game::buildImages()
 	rockSprite.loadSpriteImage("bin/images/rock.png")
 		.setCamera(camera)
 		.setEnabled(false)
-		.setFrameSize(TILE_SIZE, TILE_SIZE)
+		.setFrameSize(32, 32)
 		.setSize(TILE_SIZE, TILE_SIZE)
-		.pushFrameRow("Idle", 0, 0, TILE_SIZE, 0, 4)
+		.pushFrameRow("Idle", 0, 0, 32, 0, 4)
 		.setAnimation("Idle");
 
 	goldRockSprite.loadSpriteImage("bin/images/goldrock.png")
 		.setCamera(camera)
 		.setEnabled(false)
-		.setFrameSize(TILE_SIZE, TILE_SIZE)
+		.setFrameSize(32, 32)
 		.setSize(TILE_SIZE, TILE_SIZE)
-		.pushFrameRow("Idle", 0, 0, TILE_SIZE, 0, 4)
+		.pushFrameRow("Idle", 0, 0, 32, 0, 4)
 		.setAnimation("Idle");
 
 	minerSprite.loadSpriteImage("bin/images/weakminer.png")
@@ -626,12 +655,15 @@ void Game::buildImages()
 	tilesForest.loadImage("bin/images/tilesheetforest.png");
 	canPlace.loadImage("bin/images/greenpixel.png");
 	cantPlace.loadImage("bin/images/redpixel.png");
+	canPlacePoor.loadImage("bin/images/yellowpixel.png");
 	gridline.loadImage("bin/images/gridline.png");
 
 	uipanel.loadImage("bin/images/uipanel.png");
 	uibg.loadImage("bin/images/brownpixel.png");
 	uibg.setSize(BUTTON_SIZE, BUTTON_SIZE);
 	tileHighlight.loadImage("bin/images/highlight.png");
+	buttonHighlight.loadImage("bin/images/highlightred.png");
+	buttonHighlight.setSize(BUTTON_SIZE, BUTTON_SIZE);
 }
 
 void Game::buildTextDisplays()
@@ -683,9 +715,9 @@ void Game::buildObjects()
 }
 
 //Frames to Seconds
-double Game::FTS(double time)
+int Game::FTS(double time)
 {
-	return time * SCREEN_FPS;
+	return (int)(round(time * SCREEN_FPS));
 }
 
 void Game::addButtonObject(Sprite *spr, Object *obj)

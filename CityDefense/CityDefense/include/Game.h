@@ -35,7 +35,7 @@ public:
 	void addButtonObject(Sprite *spr, Object *obj, SDL_Rect req, Ability abi);
 
 	//Frames to Seconds
-	double FTS(double time);
+	int FTS(double time);
 
 	//Main game
 	void handleEvents();
@@ -71,14 +71,15 @@ public:
 	int gold = BASE_GOLD, stone = BASE_STONE, population = BASE_POPULATION;
 	int goldStorage = BASE_GOLD_STORAGE, stoneStorage = BASE_STONE_STORAGE, populationMax = BASE_POPULATION_MAX;
 	//Variable displays
-	Texture goldText, stoneText, populationText, tileHighlight, targetText, currentObjectText;
+	Texture goldText, stoneText, populationText, tileHighlight, buttonHighlight, targetText;
+	Texture currentObjectTextName, currentObjectTextGoldCost, currentObjectTextStoneCost, currentObjectTextPopulationCost, currentObjectTextInfo;
 	stringstream tText;
 	//Update variables
 	int preGold = gold, preStone = stone, preGoldStorage = goldStorage, preStoneStorage = stoneStorage;
 	int prePop = population, prePopMax = populationMax;
 
 	//Tilesheet
-	Texture tilesForest, canPlace, cantPlace, gridline, uipanel, uibg;
+	Texture tilesForest, canPlace, canPlacePoor, cantPlace, gridline, uipanel, uibg;
 	Tile *tiles[MAP_X][MAP_Y];
 	int maxCamX, maxCamY, maxCamH, maxCamW;
 
@@ -86,7 +87,9 @@ public:
 	bool quit = false, up = false, down = false, right = false, left = false;
 	SDL_Rect *camera;
 	int camSpeed = 12;
+	//Camera speeds and position
 	double xspeed = 0, yspeed = 0, posx, posy;
+	//Button object x and y
 	int bobx = 32, boby = 100;
 
 	//Random device
@@ -98,6 +101,8 @@ public:
 	pair<int, int> *mousePos;
 	int *mouseButton;
 	map<int, TTF_Font*> fontManager;
+	const SDL_Color COLOR_WHITE = { 255,255,255 };
+	const SDL_Color COLOR_RED = { 255,0,0 };
 
 	//SDL variables
 	SDL_Event e;

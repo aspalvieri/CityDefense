@@ -19,12 +19,14 @@ public:
 
 	Sprite& loadSpriteImage(std::string fileLocation);
 
+	//Size of the frame from the image
 	Sprite& setFrameSize(int width, int height);
 
 	Sprite& setPosition(double x, double y);
 
 	std::pair<double, double> getPosition();
 
+	//Size of the sprite in-game
 	Sprite& setSize(double width, double height);
 
 	std::pair<double, double> getSize();

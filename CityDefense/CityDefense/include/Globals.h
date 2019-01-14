@@ -39,4 +39,4 @@
 #define GOLD_ROCK_VALUE_MIN	100
 #define GOLD_ROCK_VALUE_MAX	150
 
-#endif//GLOBALS_H
+#endif//GLOBALS_H 
