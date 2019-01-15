@@ -225,7 +225,7 @@ void Game::update()
 			stoneText.loadFont("Stone: " + to_string(stone) + "/" + to_string(stoneStorage), { 255,0,0 }, fontManager[18], UI_X);
 		else
 			stoneText.loadFont("Stone: " + to_string(stone) + "/" + to_string(stoneStorage), { 255,255,255 }, fontManager[18], UI_X);
-		if (currentObject)
+		if (currentObject) //Forces update on selection target
 			preCurrentObject = NULL;
 	}
 	//Update gold display
@@ -235,7 +235,7 @@ void Game::update()
 			goldText.loadFont("Gold: " + to_string(gold) + "/" + to_string(goldStorage), { 255,0,0 }, fontManager[18], UI_X);
 		else
 			goldText.loadFont("Gold: " + to_string(gold) + "/" + to_string(goldStorage), { 255,255,255 }, fontManager[18], UI_X);
-		if (currentObject)
+		if (currentObject) //Forces update on selection target
 			preCurrentObject = NULL;
 	}
 	//Update population display
@@ -246,7 +246,7 @@ void Game::update()
 			populationText.loadFont("Population: " + to_string(population) + "/" + to_string(populationMax), { 255,0,0 }, fontManager[18], UI_X);
 		else
 			populationText.loadFont("Population: " + to_string(population) + "/" + to_string(populationMax), { 255,255,255 }, fontManager[18], UI_X);
-		if (currentObject)
+		if (currentObject) //Forces update on selection target
 			preCurrentObject = NULL;
 	}
 

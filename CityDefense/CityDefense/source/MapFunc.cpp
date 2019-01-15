@@ -16,6 +16,7 @@ void MapFunc::clearMap()
 	game->currentObject = NULL;
 	game->targetObject = NULL;
 	game->preTargetObject = NULL;
+	game->preCurrentObject = NULL;
 	game->cancelButton.setVisible(false);
 
 	//Clear objects vector
