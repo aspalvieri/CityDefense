@@ -80,7 +80,14 @@ Object & Object::setStorage(int ps, int gs, int ss)
 	return *this;
 }
 
-Object & Object::removeCost(int * pop, int * popmax, int * gold, int * goldst, int * stone, int * stonest)
+Object & Object::setIncome(int gi, int si)
+{
+	goldIncome = gi;
+	stoneIncome = si;
+	return *this;
+}
+
+Object & Object::removeCost(int * pop, int * popmax, int * gold, int * goldst, int * stone, int * stonest, int * goldinc, int * stoneinc)
 {
 	*pop += population;
 	*popmax += populationMax;
@@ -88,10 +95,12 @@ Object & Object::removeCost(int * pop, int * popmax, int * gold, int * goldst, i
 	*goldst += goldStorage;
 	*stone -= stoneCost;
 	*stonest += stoneStorage;
+	*goldinc += goldIncome;
+	*stoneinc += stoneIncome;
 	return *this;
 }
 
-Object & Object::deleteObject(int * pop, int * popmax, int * gold, int * goldst, int * stone, int * stonest)
+Object & Object::deleteObject(int * pop, int * popmax, int * gold, int * goldst, int * stone, int * stonest, int * goldinc, int * stoneinc)
 {
 	*pop -= population;
 	*popmax -= populationMax;
@@ -99,6 +108,8 @@ Object & Object::deleteObject(int * pop, int * popmax, int * gold, int * goldst,
 	*goldst -= goldStorage;
 	*stone += stoneCost;
 	*stonest -= stoneStorage;
+	*goldinc -= goldIncome;
+	*stoneinc -= stoneIncome;
 	setToDelete = true;
 	tileButton.removeFromManager();
 	return *this;
@@ -114,56 +125,4 @@ bool Object::hasCost(int *p, int *pm, int * g, int * s)
 bool Object::getCollide()
 {
 	return collide;
-}
-
-void Object::runAbility()
-{
-	if (ability.alive && ability.running) {
-		ability.run();
-	}
-}
-
-void Ability::run()
-{
-	if (enabled) 
-	{
-		abilityUpdated = false;
-		if (timer++ >= speed) 
-		{
-			timer = 0;
-			abilityUpdated = true;
-			if (type == "RockMiner" && objectValue) {
-				objectValue->abilityValue -= income;
-				if (objectValue->abilityValue < 0)
-					income += objectValue->abilityValue;
-				if (objectValue->subtype == "Gold")
-					*intValues[0] += income;
-				if (objectValue->subtype == "Stone")
-					*intValues[1] += income;
-				if (objectValue->abilityValue <= 0) {
-					objectValue->setToDelete = true;
-					objectValue = NULL;
-					running = false;
-				}
-			}
-			if (type == "GoldIncome") {
-				remaining -= income;
-				if (remaining < 0)
-					income += remaining;
-				*intValues[0] += income;
-				if (remaining <= 0) {
-					running = false;
-				}
-			}
-		}
-	}
-}
-
-string Ability::printAbility()
-{
-	stringstream abt;
-	if (type == "RockMiner") {
-		abt << "Mines " << income << " ore from rocks, every " << fixed << setprecision(1) << (speed / 60.0) << " seconds.";
-	}
-	return abt.str();
 }

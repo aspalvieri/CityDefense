@@ -1,4 +1,4 @@
-#include "..\include\SDLR.h"
+#include "../include/SDLR.h"
 
 SDLR::SDLR()
 {

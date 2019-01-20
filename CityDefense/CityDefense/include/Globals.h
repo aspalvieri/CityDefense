@@ -5,6 +5,8 @@
 #define SCREEN_HEIGHT		720
 #define SCREEN_FPS			60
 
+#define SCREEN_TICK_PER_FRAME (1000 / SCREEN_FPS)
+
 #define MAP_X		100
 #define MAP_Y		100
 #define TILE_SIZE	32

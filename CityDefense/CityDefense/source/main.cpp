@@ -1,4 +1,4 @@
-#include "..\include\Game.h"
+#include "../include/Game.h"
 
 //Create sdlr class globally since constructor needs to run before static variables are built
 SDLR sdlr;
@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 {
 	Game game;
 	game.initialize();
-
+	
 	while (game.running()) {
 		game.handleEvents();
 		game.update();

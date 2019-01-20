@@ -45,10 +45,16 @@
     <ClCompile Include="source\Tile.cpp">
       <Filter>Source Files\source</Filter>
     </ClCompile>
-    <ClCompile Include="source\MapFunc.cpp">
+    <ClCompile Include="source\Object.cpp">
       <Filter>Source Files\source</Filter>
     </ClCompile>
-    <ClCompile Include="source\Object.cpp">
+    <ClCompile Include="source\GameMapFunc.cpp">
+      <Filter>Source Files\source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Timer.cpp">
+      <Filter>Source Files\source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GameObjects.cpp">
       <Filter>Source Files\source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,10 +83,10 @@
     <ClInclude Include="include\Tile.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
-    <ClInclude Include="include\MapFunc.h">
+    <ClInclude Include="include\Object.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Object.h">
+    <ClInclude Include="include\Timer.h">
       <Filter>Header Files\include</Filter>
     </ClInclude>
   </ItemGroup>

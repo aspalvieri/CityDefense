@@ -1,16 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "Texture.h"
-#include "Sprite.h"
-#include "Button.h"
-#include "Tile.h"
-#include "MapFunc.h"
 #include "Object.h"
-
-class MapFunc;
-class Object;
-class Ability;
+#include "Timer.h"
 
 class Game
 {
@@ -31,8 +23,6 @@ public:
 	//Object Manipulation
 	void addButtonObject(Sprite *spr, Object *obj);
 	void addButtonObject(Sprite *spr, Object *obj, SDL_Rect req);
-	void addButtonObject(Sprite *spr, Object *obj, Ability abi);
-	void addButtonObject(Sprite *spr, Object *obj, SDL_Rect req, Ability abi);
 
 	//Frames to Seconds
 	int FTS(double time);
@@ -45,6 +35,10 @@ public:
 	void setCamera();
 	void moveCamera();
 
+	//Map Functions
+	void clearMap();
+	void generateMap(Texture * tilesheet);
+
 	//Randomize
 	int randomInt(int min, int max);
 	double randomDouble(double min, double max);
@@ -55,8 +49,8 @@ public:
 //*************
 //	Variables
 //*************
-	Sprite powerPlantSprite, reactorSprite, rockSprite, goldRockSprite, minerSprite, farmSprite;
-	Object powerPlant, reactor, rocks, goldrocks, rockMiner, smallFarm;
+	Sprite powerPlantSprite, reactorSprite, farmSprite, basicTowerSprite;
+	Object powerPlant, reactor, smallFarm, basicTower;
 
 	vector<Object*> objects;
 	vector<tuple<Button*, Sprite, Object*>> buttonObjects;
@@ -68,14 +62,20 @@ public:
 	Button uiButton;
 
 	//Player variables
+	int goldIncome = 0, stoneIncome = 0;
 	int gold = BASE_GOLD, stone = BASE_STONE, population = BASE_POPULATION;
 	int goldStorage = BASE_GOLD_STORAGE, stoneStorage = BASE_STONE_STORAGE, populationMax = BASE_POPULATION_MAX;
 	//Variable displays
-	Texture goldText, stoneText, populationText, tileHighlight, buttonHighlight, targetText;
+	Texture goldText, stoneText, populationText, tileHighlight, buttonHighlight, targetText, fpsText;
 	Texture currentObjectTextName, currentObjectTextGoldCost, currentObjectTextStoneCost, currentObjectTextPopulationCost, currentObjectTextInfo;
 	stringstream tText;
+	Timer fpsTimer, capFpsTimer;
+	double averageFPS = 0;
+	int countedFrames = 0;
 	//Update variables
 	int preGold = gold, preStone = stone, preGoldStorage = goldStorage, preStoneStorage = stoneStorage;
+	string preAmp = "";
+	int preGoldIncome = goldIncome, preStoneIncome = stoneIncome;
 	int prePop = population, prePopMax = populationMax;
 
 	//Tilesheet
@@ -84,6 +84,7 @@ public:
 	int maxCamX, maxCamY, maxCamH, maxCamW;
 
 	//Primary variable
+	int incomeFrames = 0;
 	bool quit = false, up = false, down = false, right = false, left = false;
 	SDL_Rect *camera;
 	int camSpeed = 12;
@@ -95,7 +96,6 @@ public:
 	//Random device
 	random_device rd;
 	mt19937 rng{rd()};
-	MapFunc *mapfunc;
 
 	//Static variables
 	pair<int, int> *mousePos;

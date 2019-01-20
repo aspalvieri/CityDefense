@@ -1,0 +1,7 @@
+different types of houses
+houses all add to population
+some houses generate lots of income
+income is: population - income = income per ticks
+some houses use some types of resources, example:
+small house 1 - 5 stone 2 gold per tick
+the trick is to balance types of incomes while expanding the whole base out

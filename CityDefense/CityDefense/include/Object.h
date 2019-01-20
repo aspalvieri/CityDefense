@@ -5,40 +5,6 @@
 #include "Tile.h"
 #include "Button.h"
 
-class Object;
-
-//Object event
-class Ability
-{
-public:
-	Ability() {}
-	Ability(string t, int *gval, int *sval, int inc, int spd) {
-		alive = true;
-		income = inc;
-		speed = spd;
-		type = t;
-		intValues.push_back(gval);
-		intValues.push_back(sval);
-	}
-	Ability(string t, int *gval, int *sval, int inc, int spd, int rem) : Ability(t, gval, sval, inc, spd) {
-		remaining = rem;
-	}
-	~Ability() {}
-
-	void run();
-	string printAbility();
-
-	bool running = true, enabled = false, alive = false;
-
-	//If set to true, forces the display to update the selected text
-	bool abilityUpdated = false;
-
-	string type = "";
-	vector<int*> intValues;
-	Object* objectValue = NULL;
-	int income = 0, speed = 0, timer = 0, remaining = 0;
-};
-
 class Object
 {
 public:
@@ -58,22 +24,24 @@ public:
 	//ps{Population Storage}, gs{Gold Storage}, ss{Stone Storage}
 	Object & setStorage(int ps = 0, int gs = 0, int ss = 0);
 
+	//gi{Gold Income}, si{Stone Income}
+	Object & setIncome(int gi = 0, int si = 0);
+
 	//Subtracts object's costs from player's values
-	Object & removeCost(int *pop, int *popmax, int *gold, int *goldst, int *stone, int *stonest);
+	Object & removeCost(int *pop, int *popmax, int *gold, int *goldst, int *stone, int *stonest, int *goldinc, int *stoneinc);
 
 	/*Does the reverse of removeCost (Adds the object's costs to the player's values),
 	and sets the object to be deleted on the next update*/
-	Object & deleteObject(int *pop, int *popmax, int *gold, int *goldst, int *stone, int *stonest);
+	Object & deleteObject(int *pop, int *popmax, int *gold, int *goldst, int *stone, int *stonest, int *goldinc, int *stoneinc);
 
 	/*Returns true if the player meets the object's costs, 
 	p{Population}, pm{Population Max}, g{Gold}, s{Stone}*/
 	bool hasCost(int *p, int *pm, int *g, int *s);
+
 	bool getCollide();
-	void runAbility();
 
 //private:
 	int goldCost = 0, stoneCost = 0;
-	Ability ability;
 	Button tileButton;
 	Sprite self;
 	string type = "", subtype = "", name = "";
@@ -84,9 +52,8 @@ public:
 	bool canPlace = true, collide, setToDelete = false;
 	//If the object can be placed by default, setting false will require a 'requiredType'
 	bool defaultPlace = true;
-	//The int value in which the ability uses
-	int abilityValue = 0;
-	int goldStorage = 0, stoneStorage = 0, population = 0, populationMax;
+	int goldStorage = 0, stoneStorage = 0, population = 0, populationMax = 0;
+	int goldIncome = 0, stoneIncome = 0;
 };
 
 #endif//OBJECT_H
