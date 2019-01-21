@@ -54,6 +54,7 @@ public:
 	bool defaultPlace = true;
 	int goldStorage = 0, stoneStorage = 0, population = 0, populationMax = 0;
 	int goldIncome = 0, stoneIncome = 0;
+	int level = 1;
 };
 
 #endif//OBJECT_H
